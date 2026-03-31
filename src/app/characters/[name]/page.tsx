@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { CharacterProfile } from '@/components/character/character-profile'
 import { CharacterRanking } from '@/components/character/character-ranking'
-import { CharacterTabs } from '@/components/character/character-tabs'
+import { CharacterMenu } from '@/components/character/character-menu'
 import { fetchCharacter, ApiError } from '@/lib/lostark-api'
 import { parseApiResponse } from '@/lib/api-parser'
 import { extractPalette } from '@/lib/extract-palette'
@@ -34,16 +34,20 @@ export default async function CharacterPage({ params }: PageProps) {
     ])
 
     return (
-      <div className="pb-12">
-        {/* 검증 단계: 프로필 카드 단독 표시 */}
-        <div className="mx-auto w-[272px] space-y-2">
-          <CharacterProfile data={data} palette={palette} />
-          {ranking && (
-            <CharacterRanking ranking={ranking} serverName={data.profile.serverName} />
-          )}
-        </div>
-        <div className="mt-8">
-          <CharacterTabs data={data} />
+      <div className="mx-auto max-w-[1100px] px-4 pb-12 pt-6">
+        <div className="flex gap-2">
+          {/* 좌측 패널: 프로필 + 랭킹 */}
+          <aside className="w-[272px] shrink-0 space-y-2">
+            <CharacterProfile data={data} palette={palette} />
+            {ranking && (
+              <CharacterRanking ranking={ranking} serverName={data.profile.serverName} />
+            )}
+          </aside>
+
+          {/* 우측 패널: 메뉴 + 콘텐츠 */}
+          <div className="min-w-0 flex-1 space-y-2">
+            <CharacterMenu />
+          </div>
         </div>
       </div>
     )

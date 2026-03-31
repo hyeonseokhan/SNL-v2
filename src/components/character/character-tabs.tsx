@@ -2,12 +2,6 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TabStats } from './tab-stats'
-import { TabEquipment } from './tab-equipment'
-import { TabGems } from './tab-gems'
-import { TabEngraving } from './tab-engraving'
-import { TabArkPassive } from './tab-ark-passive'
-import { TabCards } from './tab-cards'
-import { TabSkills } from './tab-skills'
 import type { CharData } from '@/types/character'
 
 interface CharacterTabsProps {
@@ -15,21 +9,33 @@ interface CharacterTabsProps {
 }
 
 const tabs = [
-  { value: 'stats', label: '능력치' },
-  { value: 'equipment', label: '장비' },
-  { value: 'engraving', label: '각인' },
-  { value: 'ark-passive', label: '아크패시브' },
-  { value: 'gems', label: '보석' },
-  { value: 'cards', label: '카드' },
-  { value: 'skills', label: '스킬' },
+  { value: 'stats',      label: '능력치' },
+  { value: 'avatar',     label: '아바타' },
+  { value: 'skills',     label: '스킬' },
+  { value: 'characters', label: '보유 캐릭터' },
 ] as const
+
+function TabPlaceholder({ label }: { label: string }) {
+  return (
+    <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
+      {label} — 준비 중
+    </div>
+  )
+}
 
 export function CharacterTabs({ data }: CharacterTabsProps) {
   return (
     <Tabs defaultValue="stats" className="w-full">
-      <TabsList variant="line" className="w-full justify-start overflow-x-auto border-b border-border/50">
+      <TabsList
+        variant="line"
+        className="w-full justify-start overflow-x-auto border-b border-border/40"
+      >
         {tabs.map((tab) => (
-          <TabsTrigger key={tab.value} value={tab.value} className="text-sm px-4 py-2.5">
+          <TabsTrigger
+            key={tab.value}
+            value={tab.value}
+            className="px-4 py-2.5 text-sm"
+          >
             {tab.label}
           </TabsTrigger>
         ))}
@@ -39,23 +45,14 @@ export function CharacterTabs({ data }: CharacterTabsProps) {
         <TabsContent value="stats">
           <TabStats data={data} />
         </TabsContent>
-        <TabsContent value="equipment">
-          <TabEquipment data={data} />
-        </TabsContent>
-        <TabsContent value="engraving">
-          <TabEngraving data={data} />
-        </TabsContent>
-        <TabsContent value="ark-passive">
-          <TabArkPassive data={data} />
-        </TabsContent>
-        <TabsContent value="gems">
-          <TabGems data={data} />
-        </TabsContent>
-        <TabsContent value="cards">
-          <TabCards data={data} />
+        <TabsContent value="avatar">
+          <TabPlaceholder label="아바타" />
         </TabsContent>
         <TabsContent value="skills">
-          <TabSkills data={data} />
+          <TabPlaceholder label="스킬" />
+        </TabsContent>
+        <TabsContent value="characters">
+          <TabPlaceholder label="보유 캐릭터" />
         </TabsContent>
       </div>
     </Tabs>
