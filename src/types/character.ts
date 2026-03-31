@@ -32,9 +32,11 @@ export interface EquipItem {
   icon: string
   grade: string
   quality: number
-  level: number
+  itemLevel: number
+  tier: number
   refine: number
   option: string[]
+  tooltipRaw: string
 }
 
 // ===================================================================
@@ -54,13 +56,17 @@ export interface AccessoryInfo {
   icon: string
   grade: string
   quality: number
+  tier: number
+  enlightenment: number
   option: string[]
+  tooltipRaw: string
 }
 
 export interface NamedItem {
   name: string
   icon: string
   grade: string
+  tooltipRaw: string
 }
 
 export interface ArmoryData {

@@ -26,9 +26,21 @@ function parseTooltip(raw: string | undefined): Record<string, any> {
 }
 
 function parseEnhanceOptions(raw: string): string[] {
-  const cleaned = stripHtml(raw)
-  const parts = cleaned.split(/(?<=[\d%])\s*(?=[가-힣])/g)
-  return parts.map((p) => p.trim()).filter(Boolean)
+  // <br> 기준으로 분리 후 FONT COLOR 로 상/중/하 판별
+  const COLOR_GRADE: Record<string, string> = {
+    'FE9600': '상',
+    'CE43FC': '중',
+    '00B5FF': '하',
+  }
+  return raw
+    .split(/<br\s*\/?>/i)
+    .map((part) => {
+      const colorMatch = part.match(/FONT\s+COLOR=['"]?([0-9A-Fa-f]{6})/i)
+      const grade = colorMatch ? (COLOR_GRADE[colorMatch[1].toUpperCase()] ?? '하') : '하'
+      const text = stripHtml(part).trim()
+      return text ? `${grade} ${text}` : null
+    })
+    .filter(Boolean) as string[]
 }
 
 function parseBangleOptions(raw: string): string[] {
@@ -114,6 +126,32 @@ function parseEquipment(equipment: any[]) {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function itemLevelAndTier(item: any): { itemLevel: number; tier: number } {
+    if (!item) return { itemLevel: 0, tier: 0 }
+    const t = parseTooltip(item.Tooltip)
+    const raw = stripHtml(t.Element_000?.value?.leftStr2 ?? '')
+    const lvMatch = raw.match(/아이템 레벨\s+([\d,]+)/)
+    const tierMatch = raw.match(/티어\s*(\d+)/)
+    return {
+      itemLevel: lvMatch ? parseInt(lvMatch[1].replace(/,/g, '')) : 0,
+      tier: tierMatch ? parseInt(tierMatch[1]) : 0,
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function accEnlightenment(item: any): number {
+    if (!item) return 0
+    const t = parseTooltip(item.Tooltip)
+    for (let i = 2; i <= 8; i++) {
+      const key = `Element_00${i}`
+      const val = stripHtml(t[key]?.value?.Element_000 ?? t[key]?.value ?? '')
+      const m = val.match(/깨달음\s*\+(\d+)/)
+      if (m) return parseInt(m[1])
+    }
+    return 0
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function accOptions(item: any): string[] {
     if (!item) return []
     const t = parseTooltip(item.Tooltip)
@@ -146,15 +184,18 @@ function parseEquipment(equipment: any[]) {
       const name: string = e.Name ?? ''
       const refineMatch = name.match(/^\+(\d+)/)
       const refine = refineMatch ? parseInt(refineMatch[1]) : 0
+      const { itemLevel, tier } = itemLevelAndTier(e)
       return {
         type: e.Type as string,
         name,
         icon: (e.Icon ?? '') as string,
         grade: (e.Grade ?? '') as string,
         quality: itemQuality(e),
-        level: 0,
+        itemLevel,
+        tier,
         refine,
         option: [] as string[],
+        tooltipRaw: (e.Tooltip ?? '') as string,
       }
     })
 
@@ -174,12 +215,16 @@ function parseEquipment(equipment: any[]) {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function accInfo(item: any) {
+    const { tier } = itemLevelAndTier(item)
     return {
       name: (item?.Name ?? '') as string,
       icon: (item?.Icon ?? '') as string,
       grade: (item?.Grade ?? '') as string,
       quality: itemQuality(item),
+      tier,
+      enlightenment: accEnlightenment(item),
       option: accOptions(item),
+      tooltipRaw: (item?.Tooltip ?? '') as string,
     }
   }
 
@@ -189,6 +234,7 @@ function parseEquipment(equipment: any[]) {
       name: (item?.Name ?? '') as string,
       icon: (item?.Icon ?? '') as string,
       grade: (item?.Grade ?? '') as string,
+      tooltipRaw: (item?.Tooltip ?? '') as string,
     }
   }
 

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { CharacterProfile } from '@/components/character/character-profile'
 import { CharacterRanking } from '@/components/character/character-ranking'
-import { CharacterMenu } from '@/components/character/character-menu'
+import { CharacterContent } from '@/components/character/character-content'
 import { fetchCharacter, ApiError } from '@/lib/lostark-api'
 import { parseApiResponse } from '@/lib/api-parser'
 import { extractPalette } from '@/lib/extract-palette'
@@ -45,8 +45,8 @@ export default async function CharacterPage({ params }: PageProps) {
           </aside>
 
           {/* 우측 패널: 메뉴 + 콘텐츠 */}
-          <div className="min-w-0 flex-1 space-y-2">
-            <CharacterMenu />
+          <div className="min-w-0 flex-1">
+            <CharacterContent data={data} />
           </div>
         </div>
       </div>
