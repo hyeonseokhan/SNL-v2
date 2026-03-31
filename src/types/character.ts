@@ -23,7 +23,22 @@ export interface ArkPassiveSection {
 }
 
 // ===================================================================
-// 장비 / 악세서리
+// 장비 아이템 (개별)
+// ===================================================================
+
+export interface EquipItem {
+  type: string
+  name: string
+  icon: string
+  grade: string
+  quality: number
+  level: number
+  refine: number
+  option: string[]
+}
+
+// ===================================================================
+// 장비 / 악세서리 (구조화)
 // ===================================================================
 
 export interface WeaponInfo {
@@ -31,17 +46,26 @@ export interface WeaponInfo {
   quality: number
   refine: number
   grade: string
+  icon: string
 }
 
 export interface AccessoryInfo {
+  name: string
+  icon: string
+  grade: string
+  quality: number
   option: string[]
 }
 
 export interface NamedItem {
   name: string
+  icon: string
+  grade: string
 }
 
 export interface ArmoryData {
+  /** 방어구 6종 (머리/어깨/상의/하의/장갑/무기) */
+  equipList: EquipItem[]
   equipment: {
     weapon: WeaponInfo
   }
@@ -51,7 +75,8 @@ export interface ArmoryData {
     earing2: AccessoryInfo
     ring1: AccessoryInfo
     ring2: AccessoryInfo
-    bangle: AccessoryInfo
+    bangle: AccessoryInfo & { option: string[] }
+    stone: NamedItem & { option: string[] }
     compass: NamedItem
     charm: NamedItem
     orb: NamedItem
@@ -65,6 +90,7 @@ export interface ArmoryData {
 export interface GemData {
   level: number
   name: string
+  icon: string
   grade: string
   type: string
   effect: string
@@ -79,10 +105,6 @@ export interface EngravingData {
   level: number
   icon: string
 }
-
-// ===================================================================
-// 카드
-// ===================================================================
 
 // card는 문자열로 표현 (예: "세상을 구하는 빛 30각")
 
@@ -136,7 +158,12 @@ export interface CharData {
     characterLevel: number
     guildName: string
     title: string
+    titleIcon: string
     characterImage: string | null
+    expeditionLevel: number
+    pvpGrade: string
+    townLevel: number
+    townName: string
   }
   stats: {
     critical: number

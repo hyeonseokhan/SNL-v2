@@ -87,28 +87,31 @@ function parseProfile(armoryProfile: any) {
       serverName: armoryProfile.ServerName ?? '',
       characterLevel: Number(armoryProfile.CharacterLevel ?? 0),
       guildName: armoryProfile.GuildName ?? '',
-      title: armoryProfile.Title ?? '',
+      title: stripHtml(armoryProfile.Title ?? ''),
+      titleIcon: ((): string => {
+        const m = (armoryProfile.Title ?? '').match(/src='([^']+)'/)
+        return m ? `https://cdn.korlark.com/lostark/icons/honortitle/${m[1]}.webp` : ''
+      })(),
       characterImage: armoryProfile.CharacterImage ?? null,
+      expeditionLevel: Number(armoryProfile.ExpeditionLevel ?? 0),
+      pvpGrade: armoryProfile.PvpGradeName ?? '',
+      townLevel: Number(armoryProfile.TownLevel ?? 0),
+      townName: armoryProfile.TownName ?? '',
     },
   }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseEquipment(equipment: any[]) {
-  const weaponItem = equipment.find((e) => e.Type === '무기')
-  const weaponTooltip = parseTooltip(weaponItem?.Tooltip)
-  const weaponQuality = weaponTooltip.Element_001?.value?.qualityValue ?? 0
-  const weaponName: string = weaponItem?.Name ?? ''
-  const refineMatch = weaponName.match(/^\+(\d+)/)
-  const weaponRefine = refineMatch ? parseInt(refineMatch[1]) : 0
+  const EQUIP_TYPES = ['무기', '투구', '어깨', '상의', '하의', '장갑']
 
-  const necklaceItem = equipment.find((e) => e.Type === '목걸이')
-  const earrings = equipment.filter((e) => e.Type === '귀걸이')
-  const rings = equipment.filter((e) => e.Type === '반지')
-  const bangleItem = equipment.find((e) => e.Type === '팔찌')
-  const compItem = equipment.find((e) => e.Type === '나침반')
-  const charmItem = equipment.find((e) => e.Type === '부적')
-  const orbItem = equipment.find((e) => e.Type === '보주')
+  // ── 헬퍼 ──────────────────────────────────────────────
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function itemQuality(item: any): number {
+    if (!item) return -1
+    const t = parseTooltip(item.Tooltip)
+    return t.Element_001?.value?.qualityValue ?? -1
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function accOptions(item: any): string[] {
@@ -126,26 +129,92 @@ function parseEquipment(equipment: any[]) {
     return parseBangleOptions(raw)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function stoneOptions(item: any): string[] {
+    if (!item) return []
+    const t = parseTooltip(item.Tooltip)
+    const r1 = stripHtml(t.Element_004?.value?.Element_001 ?? '')
+    const r2 = stripHtml(t.Element_005?.value?.Element_001 ?? '')
+    return [r1, r2].filter(Boolean)
+  }
+
+  // ── equipList (방어구 6종) ──────────────────────────────
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const equipList = equipment
+    .filter((e) => EQUIP_TYPES.includes(e.Type))
+    .map((e) => {
+      const name: string = e.Name ?? ''
+      const refineMatch = name.match(/^\+(\d+)/)
+      const refine = refineMatch ? parseInt(refineMatch[1]) : 0
+      return {
+        type: e.Type as string,
+        name,
+        icon: (e.Icon ?? '') as string,
+        grade: (e.Grade ?? '') as string,
+        quality: itemQuality(e),
+        level: 0,
+        refine,
+        option: [] as string[],
+      }
+    })
+
+  // ── 개별 아이템 ────────────────────────────────────────
+  const weaponItem = equipment.find((e) => e.Type === '무기')
+  const weaponName: string = weaponItem?.Name ?? ''
+  const weaponRefine = parseInt(weaponName.match(/^\+(\d+)/)?.[1] ?? '0')
+
+  const necklaceItem = equipment.find((e) => e.Type === '목걸이')
+  const earrings = equipment.filter((e) => e.Type === '귀걸이')
+  const rings = equipment.filter((e) => e.Type === '반지')
+  const bangleItem = equipment.find((e) => e.Type === '팔찌')
+  const stoneItem = equipment.find((e) => e.Type === '어빌리티 스톤')
+  const compItem = equipment.find((e) => e.Type === '나침반')
+  const charmItem = equipment.find((e) => e.Type === '부적')
+  const orbItem = equipment.find((e) => e.Type === '보주')
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function accInfo(item: any) {
+    return {
+      name: (item?.Name ?? '') as string,
+      icon: (item?.Icon ?? '') as string,
+      grade: (item?.Grade ?? '') as string,
+      quality: itemQuality(item),
+      option: accOptions(item),
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function namedInfo(item: any) {
+    return {
+      name: (item?.Name ?? '') as string,
+      icon: (item?.Icon ?? '') as string,
+      grade: (item?.Grade ?? '') as string,
+    }
+  }
+
   return {
     armory: {
+      equipList,
       equipment: {
         weapon: {
           name: weaponName,
-          quality: weaponQuality,
+          quality: itemQuality(weaponItem),
           refine: weaponRefine,
-          grade: weaponItem?.Grade ?? '',
+          grade: (weaponItem?.Grade ?? '') as string,
+          icon: (weaponItem?.Icon ?? '') as string,
         },
       },
       accessory: {
-        necklace: { option: accOptions(necklaceItem) },
-        earing1: { option: accOptions(earrings[0]) },
-        earing2: { option: accOptions(earrings[1]) },
-        ring1: { option: accOptions(rings[0]) },
-        ring2: { option: accOptions(rings[1]) },
-        bangle: { option: bangOptions(bangleItem) },
-        compass: { name: compItem?.Name ?? '' },
-        charm: { name: charmItem?.Name ?? '' },
-        orb: { name: orbItem?.Name ?? '' },
+        necklace: accInfo(necklaceItem),
+        earing1: accInfo(earrings[0]),
+        earing2: accInfo(earrings[1]),
+        ring1: accInfo(rings[0]),
+        ring2: accInfo(rings[1]),
+        bangle: { ...accInfo(bangleItem), option: bangOptions(bangleItem) },
+        stone: { ...namedInfo(stoneItem), option: stoneOptions(stoneItem) },
+        compass: namedInfo(compItem),
+        charm: namedInfo(charmItem),
+        orb: namedInfo(orbItem),
       },
     },
   }
@@ -240,6 +309,7 @@ function parseGems(armoryGem: any) {
     gem: gems.map((g, idx) => ({
       level: g.Level ?? 0,
       name: stripHtml(g.Name),
+      icon: (g.Icon ?? '') as string,
       grade: g.Grade ?? '',
       type: (g.Name ?? '').includes('작열') ? 'cooldown' : 'damage',
       effect: effMap[idx]?.Description ?? '',

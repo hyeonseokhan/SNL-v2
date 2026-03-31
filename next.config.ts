@@ -1,7 +1,26 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cdn-lostark.game.onstove.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.lostark.game.onstove.com",
+      },
+      {
+        protocol: "https",
+        hostname: "img.lostark.co.kr",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.korlark.com",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

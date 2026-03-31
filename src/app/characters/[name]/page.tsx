@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { Separator } from '@/components/ui/separator'
-import { CharacterHeader } from '@/components/character/character-header'
+import { CharacterProfile } from '@/components/character/character-profile'
 import { CharacterTabs } from '@/components/character/character-tabs'
 import { fetchCharacter, ApiError } from '@/lib/lostark-api'
 import { parseApiResponse } from '@/lib/api-parser'
@@ -29,9 +28,11 @@ export default async function CharacterPage({ params }: PageProps) {
 
     return (
       <div className="pb-12">
-        <CharacterHeader data={data} />
-        <Separator />
-        <div className="mt-6">
+        {/* 검증 단계: 프로필 카드 단독 표시 */}
+        <div className="mx-auto w-[272px]">
+          <CharacterProfile data={data} />
+        </div>
+        <div className="mt-8">
           <CharacterTabs data={data} />
         </div>
       </div>
