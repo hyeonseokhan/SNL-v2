@@ -1,20 +1,27 @@
 'use client'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { TabPlaceholder } from './tab-placeholder'
-import type { CharacterData } from '@/types/character'
+import { TabStats } from './tab-stats'
+import { TabEquipment } from './tab-equipment'
+import { TabGems } from './tab-gems'
+import { TabEngraving } from './tab-engraving'
+import { TabArkPassive } from './tab-ark-passive'
+import { TabCards } from './tab-cards'
+import { TabSkills } from './tab-skills'
+import type { CharData } from '@/types/character'
 
 interface CharacterTabsProps {
-  data: CharacterData
+  data: CharData
 }
 
 const tabs = [
   { value: 'stats', label: '능력치' },
   { value: 'equipment', label: '장비' },
-  { value: 'skills', label: '스킬' },
+  { value: 'engraving', label: '각인' },
+  { value: 'ark-passive', label: '아크패시브' },
   { value: 'gems', label: '보석' },
   { value: 'cards', label: '카드' },
-  { value: 'collectibles', label: '수집품' },
+  { value: 'skills', label: '스킬' },
 ] as const
 
 export function CharacterTabs({ data }: CharacterTabsProps) {
@@ -32,45 +39,25 @@ export function CharacterTabs({ data }: CharacterTabsProps) {
       {/* --- 탭 콘텐츠 --- */}
       <div className="mt-4">
         <TabsContent value="stats">
-          <TabPlaceholder
-            title="능력치"
-            description={`치명 ${data.stats.critical} / 특화 ${data.stats.specialization} / 신속 ${data.stats.swiftness}`}
-          />
+          <TabStats data={data} />
         </TabsContent>
-
         <TabsContent value="equipment">
-          <TabPlaceholder
-            title="장비"
-            description={`장착 장비 ${data.equipment.length}개`}
-          />
+          <TabEquipment data={data} />
         </TabsContent>
-
-        <TabsContent value="skills">
-          <TabPlaceholder
-            title="스킬"
-            description={`등록된 스킬 ${data.skills.length}개`}
-          />
+        <TabsContent value="engraving">
+          <TabEngraving data={data} />
         </TabsContent>
-
+        <TabsContent value="ark-passive">
+          <TabArkPassive data={data} />
+        </TabsContent>
         <TabsContent value="gems">
-          <TabPlaceholder
-            title="보석"
-            description={`장착 보석 ${data.gems.length}개`}
-          />
+          <TabGems data={data} />
         </TabsContent>
-
         <TabsContent value="cards">
-          <TabPlaceholder
-            title="카드"
-            description={`카드 세트 ${data.cards.length}개`}
-          />
+          <TabCards data={data} />
         </TabsContent>
-
-        <TabsContent value="collectibles">
-          <TabPlaceholder
-            title="수집품"
-            description={`수집 항목 ${data.collectibles.length}개`}
-          />
+        <TabsContent value="skills">
+          <TabSkills data={data} />
         </TabsContent>
       </div>
     </Tabs>
