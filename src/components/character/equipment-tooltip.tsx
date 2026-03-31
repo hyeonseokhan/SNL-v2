@@ -99,8 +99,15 @@ function TooltipContent({ parsed, icon }: TooltipContentProps) {
       {/* 헤더: 아이콘 + 이름 */}
       <div className="flex items-start gap-2.5 p-3">
         {icon && (
-          <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded">
-            <Image src={icon} alt={name} fill className="object-contain" sizes="44px" />
+          <div
+            className="relative h-11 w-11 shrink-0"
+            style={{
+              backgroundImage: `url(https://cdn-lostark.game.onstove.com/2018/obt/assets/images/common/game/bg_special_slot.png)`,
+              backgroundSize: '100% 100%',
+              backgroundColor: '#0d1117',
+            }}
+          >
+            <Image src={icon} alt={name} fill className="object-contain" sizes="44px" unoptimized />
           </div>
         )}
         <div className="min-w-0 flex-1">

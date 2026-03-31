@@ -85,17 +85,31 @@ function OptionLine({ text }: { text: string }) {
 }
 
 // ===================================================================
-// 아이콘 (공식 방식 — PNG에 테두리 내장)
+// 아이콘 (공식 방식 — PNG 내장 테두리 + bg_special_slot 오버레이)
 // ===================================================================
 
+/** 공식 전투정보실과 동일: 아이콘 위에 프레임 오버레이 적용 */
+const BG_SLOT_URL =
+  'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/common/game/bg_special_slot.png'
+
 function ItemIcon({
-  icon, name, tier, size = 44,
+  icon, name, tier, size = 36,
 }: {
   icon: string; name: string; tier: number; size?: number
 }) {
   return (
-    <div className="relative shrink-0" style={{ width: size, height: size }}>
-      {icon ? (
+    <div
+      className="relative shrink-0"
+      style={{
+        width: size,
+        height: size,
+        backgroundImage: `url(${BG_SLOT_URL})`,
+        backgroundSize: '100% 100%',
+        backgroundRepeat: 'no-repeat',
+        backgroundColor: '#0d1117',
+      }}
+    >
+      {icon && (
         <Image
           src={icon}
           alt={name}
@@ -104,8 +118,6 @@ function ItemIcon({
           sizes={`${size}px`}
           unoptimized
         />
-      ) : (
-        <div className="h-full w-full rounded bg-white/5" />
       )}
       <TierBadge tier={tier} />
     </div>
@@ -186,7 +198,7 @@ function OrbRow({ item }: { item: NamedItem }) {
   return (
     <EquipmentTooltip tooltipRaw={item.tooltipRaw} icon={item.icon} side="right">
       <div className="flex cursor-default items-center gap-2">
-        <ItemIcon icon={item.icon} name={item.name} tier={0} size={40} />
+        <ItemIcon icon={item.icon} name={item.name} tier={0} />
         <div className="min-w-0">
           <p className="text-[10px] text-white/30">보주</p>
           <p className={`truncate text-[11px] font-medium leading-tight ${gradeNameColor(item.grade)}`}>
@@ -207,7 +219,7 @@ function BangleRow({ item }: { item: AccessoryInfo }) {
   return (
     <EquipmentTooltip tooltipRaw={item.tooltipRaw} icon={item.icon} side="left">
       <div className="flex cursor-default items-start gap-2">
-        <ItemIcon icon={item.icon} name={item.name} tier={item.tier} size={40} />
+        <ItemIcon icon={item.icon} name={item.name} tier={item.tier} />
         <div className="min-w-0">
           <p className={`truncate text-[11px] font-medium leading-tight ${gradeNameColor(item.grade)}`}>
             {item.name}
