@@ -4,6 +4,7 @@ import { CharacterProfile } from '@/components/character/character-profile'
 import { CharacterTabs } from '@/components/character/character-tabs'
 import { fetchCharacter, ApiError } from '@/lib/lostark-api'
 import { parseApiResponse } from '@/lib/api-parser'
+import { extractPalette } from '@/lib/extract-palette'
 
 interface PageProps {
   params: Promise<{ name: string }>
@@ -25,12 +26,13 @@ export default async function CharacterPage({ params }: PageProps) {
   try {
     const raw = await fetchCharacter(decodedName)
     const data = parseApiResponse(raw)
+    const palette = await extractPalette(data.profile.characterImage ?? '')
 
     return (
       <div className="pb-12">
         {/* 검증 단계: 프로필 카드 단독 표시 */}
         <div className="mx-auto w-[272px]">
-          <CharacterProfile data={data} />
+          <CharacterProfile data={data} palette={palette} />
         </div>
         <div className="mt-8">
           <CharacterTabs data={data} />

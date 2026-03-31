@@ -11,6 +11,7 @@
 
 import Image from "next/image";
 import type { CharData } from "@/types/character";
+import type { CharPalette } from "@/lib/extract-palette";
 
 // ===================================================================
 // 아이콘 SVG
@@ -79,6 +80,7 @@ function CombatIcon({ className }: { className?: string }) {
 
 interface CharacterProfileProps {
   data: CharData;
+  palette?: CharPalette;
 }
 
 interface TagItem {
@@ -94,13 +96,17 @@ function TagList({ items }: { items: TagItem[] }) {
   return (
     <ul className="space-y-[3px]">
       {filled.map(({ label, value, icon }) => (
-        <li key={label} className="flex items-center gap-1.5 text-[12px] leading-tight">
-          <span className="w-[38px] shrink-0 text-white/35">{label}</span>
+        <li
+          key={label}
+          className="flex items-center gap-1.5 text-[12px] leading-tight"
+          style={{ textShadow: '0 1px 3px rgba(0,0,0,0.95)' }}
+        >
+          <span className="w-[38px] shrink-0 text-white/55">{label}</span>
           <span className="flex items-center gap-[2px]">
             {icon && (
               <Image src={icon} alt="" width={16} height={16} className="shrink-0 object-contain" style={{ width: 16, height: 'auto' }} />
             )}
-            <span className="text-white/65">{value}</span>
+            <span className="text-white/85">{value}</span>
           </span>
         </li>
       ))}
@@ -108,7 +114,7 @@ function TagList({ items }: { items: TagItem[] }) {
   );
 }
 
-export function CharacterProfile({ data }: CharacterProfileProps) {
+export function CharacterProfile({ data, palette }: CharacterProfileProps) {
   const { profile, stats, arkPassive } = data;
 
   // 깨달음 1티어 첫 번째 노드 이름 → #태그로 표시
@@ -140,9 +146,9 @@ export function CharacterProfile({ data }: CharacterProfileProps) {
         <div
           className="absolute"
           style={{
-            width: "153%",   /* KLOA: 612px / 400px = 1.53× */
-            right: "-45%",   /* 우측으로 오프셋 */
-            top: "-18%",     /* 상단 오프셋으로 상반신 노출 */
+            width: "153%",
+            right: "-45%",
+            top: "-18%",
             bottom: "-5%",
           }}
         >
@@ -157,24 +163,55 @@ export function CharacterProfile({ data }: CharacterProfileProps) {
         </div>
       )}
 
+      {/* ── 팔레트 컬러 오버레이 (이미지 위에 은은한 색감) ── */}
+      {palette && (
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `radial-gradient(ellipse at 65% 35%, ${palette.vibrant}14 0%, ${palette.darkVibrant}10 50%, transparent 75%)`,
+            mixBlendMode: 'soft-light',
+          }}
+        />
+      )}
+
       {/* ── 좌측 엣지 페이드 ── */}
-      <div className="absolute inset-y-0 left-0 w-[62%] bg-gradient-to-r from-[#15181d] via-[#15181d]/80 to-transparent" />
+      <div
+        className="absolute inset-y-0 left-0 w-[62%]"
+        style={{
+          background: palette
+            ? `linear-gradient(to right, ${palette.darkVibrant}3c 0%, ${palette.darkVibrant}26 50%, transparent 100%)`
+            : 'linear-gradient(to right, #15181d 0%, #15181dee 50%, transparent 100%)',
+        }}
+      />
 
       {/* ── 하단 페이드 ── */}
-      <div className="absolute inset-x-0 bottom-0 h-[20%] bg-gradient-to-t from-[#15181d] to-transparent" />
+      <div
+        className="absolute inset-x-0 bottom-0 h-[20%]"
+        style={{
+          background: palette
+            ? `linear-gradient(to top, ${palette.darkVibrant}38, transparent)`
+            : 'linear-gradient(to top, #15181d, transparent)',
+        }}
+      />
 
       {/* ── 정보 레이어 (좌측) ── */}
       <div className="absolute inset-y-0 left-0 flex w-[62%] flex-col px-4 py-5">
         {/* 레벨 · 직업 · 깨달음 태그 (한 줄) */}
-        <p className="text-[11px] font-medium text-white/75">
+        <p
+          className="text-[11px] font-medium text-white/90"
+          style={{ textShadow: '0 1px 4px rgba(0,0,0,0.95)' }}
+        >
           Lv.{profile.characterLevel}&nbsp;&nbsp;{profile.class}
           {enlightenmentTag && (
-            <span className="text-white/50">&nbsp;&nbsp;#{enlightenmentTag}</span>
+            <span className="text-white/65">&nbsp;&nbsp;#{enlightenmentTag}</span>
           )}
         </p>
 
         {/* 캐릭터명 */}
-        <h2 className="mt-2 break-keep text-[19px] font-bold leading-snug tracking-tight text-white">
+        <h2
+          className="mt-2 break-keep text-[19px] font-bold leading-snug tracking-tight text-white"
+          style={{ textShadow: '0 1px 6px rgba(0,0,0,0.95), 0 0 12px rgba(0,0,0,0.6)' }}
+        >
           {profile.characterName}
         </h2>
 
@@ -182,17 +219,23 @@ export function CharacterProfile({ data }: CharacterProfileProps) {
         <div className="my-3 h-px w-8 bg-white/25" />
 
         {/* 아이템 레벨 */}
-        <div className="flex items-center gap-2">
+        <div
+          className="flex items-center gap-2"
+          style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.95))' }}
+        >
           <HelmetIcon className="size-[16px] shrink-0" />
-          <span className="text-[17px] font-bold tabular-nums tracking-tight bg-gradient-to-b from-white to-slate-300 bg-clip-text text-transparent">
+          <span className="text-[17px] font-bold tabular-nums tracking-tight bg-gradient-to-b from-white to-slate-200 bg-clip-text text-transparent">
             {iLvFormatted}
           </span>
         </div>
 
         {/* 전투력 */}
-        <div className="mt-1 flex items-center gap-2">
+        <div
+          className="mt-1 flex items-center gap-2"
+          style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.95))' }}
+        >
           <CombatIcon className="size-[16px] shrink-0" />
-          <span className="text-[17px] font-bold tabular-nums tracking-tight bg-gradient-to-b from-white to-slate-300 bg-clip-text text-transparent">
+          <span className="text-[17px] font-bold tabular-nums tracking-tight bg-gradient-to-b from-white to-slate-200 bg-clip-text text-transparent">
             {stats.combatPower.toLocaleString()}
           </span>
         </div>
