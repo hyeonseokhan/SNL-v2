@@ -86,42 +86,48 @@
 }
 
 .dark {
-  --background: #0d1117;
-  --foreground: #e6edf3;
-  --card: #151a23;
-  --card-foreground: #e6edf3;
-  --popover: #1c2128;
-  --popover-foreground: #e6edf3;
-  --primary: #58a6ff;
-  --primary-foreground: #0d1117;
-  --secondary: #1c2128;
-  --secondary-foreground: #c9d1d9;
-  --muted: #1c2128;
-  --muted-foreground: #8b949e;
-  --accent: #1f2937;
-  --accent-foreground: #e6edf3;
+  /* KLOA 실제 색상값 기반 */
+  --background: oklch(0.19 0.03 283);
+  --foreground: oklch(1 0 0 / 0.87);
+  --card: oklch(0.263 0.026 284);
+  --card-foreground: oklch(1 0 0 / 0.87);
+  --popover: oklch(0.263 0.026 284);
+  --popover-foreground: oklch(1 0 0 / 0.87);
+  --primary: oklch(0.545 0.218 296);
+  --primary-foreground: #fff;
+  --secondary: oklch(0.22 0.025 283);
+  --secondary-foreground: oklch(1 0 0 / 0.6);
+  --muted: oklch(0.22 0.025 283);
+  --muted-foreground: oklch(1 0 0 / 0.38);
+  --accent: oklch(0.263 0.026 284);
+  --accent-foreground: oklch(1 0 0 / 0.87);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: #30363d;
-  --input: #30363d;
-  --ring: #58a6ff;
-  --chart-1: #58a6ff;
-  --chart-2: #3fb950;
-  --chart-3: #d29922;
-  --chart-4: #f85149;
-  --chart-5: #bc8cff;
-  --sidebar: #161b22;
-  --sidebar-foreground: #e6edf3;
-  --sidebar-primary: #58a6ff;
-  --sidebar-primary-foreground: #0d1117;
-  --sidebar-accent: #1c2128;
-  --sidebar-accent-foreground: #e6edf3;
-  --sidebar-border: #30363d;
-  --sidebar-ring: #58a6ff;
-  --elevated: #1c2128;
+  --border: oklch(0.398 0.033 257 / 0.4);
+  --input: oklch(0.398 0.033 257 / 0.4);
+  --ring: oklch(0.545 0.218 296);
+  --chart-1: oklch(0.545 0.218 296);
+  --chart-2: oklch(0.723 0.219 149);
+  --chart-3: oklch(0.817 0.089 87);
+  --chart-4: oklch(0.628 0.258 29);
+  --chart-5: oklch(0.741 0.188 304);
+  --sidebar: oklch(0.22 0.025 283);
+  --sidebar-foreground: oklch(1 0 0 / 0.87);
+  --sidebar-primary: oklch(0.545 0.218 296);
+  --sidebar-primary-foreground: #fff;
+  --sidebar-accent: oklch(0.263 0.026 284);
+  --sidebar-accent-foreground: oklch(1 0 0 / 0.87);
+  --sidebar-border: oklch(0.398 0.033 257 / 0.4);
+  --sidebar-ring: oklch(0.545 0.218 296);
+  --elevated: oklch(0.263 0.026 284);
+  /* KLOA 전투 특성 숫자 색상 */
+  --stat-value: oklch(0.824 0.084 295);
+  --stat-muted: oklch(1 0 0 / 0.2);
 }
 
 @theme inline {
   --color-elevated: var(--elevated, var(--card));
+  --color-stat-value: var(--stat-value, var(--foreground));
+  --color-stat-muted: var(--stat-muted, var(--muted-foreground));
 }
 
 @layer base {
