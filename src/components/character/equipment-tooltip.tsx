@@ -12,6 +12,32 @@ import { parseTooltipJson } from '@/lib/tooltip-parser'
 import type { ParsedTooltip, TooltipLine } from '@/lib/tooltip-parser'
 
 // ===================================================================
+// 아이콘 헬퍼 (character-equipment와 동일한 3레이어 구조)
+// ===================================================================
+
+const CDN = 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/common/game'
+const ARMOR_TYPES = new Set(['투구', '어깨', '상의', '하의', '장갑', '무기'])
+
+function gradeBackground(grade: string): string {
+  switch (grade) {
+    case '고대': return 'linear-gradient(135deg, rgb(61,51,37), rgb(220,201,153))'
+    case '유물': return 'linear-gradient(135deg, rgb(52,26,9), rgb(162,64,6))'
+    case '전설': return 'linear-gradient(135deg, rgb(40,32,0), rgb(168,138,0))'
+    case '영웅': return 'linear-gradient(135deg, rgb(26,8,36), rgb(118,44,188))'
+    case '희귀': return 'linear-gradient(135deg, rgb(8,18,40), rgb(28,82,178))'
+    default:     return 'linear-gradient(135deg, rgb(18,20,26), rgb(45,48,58))'
+  }
+}
+
+/** gradeType 문자열("고대 우산" 등)에서 등급 추출 */
+function extractGrade(gradeType: string): string {
+  for (const g of ['고대', '유물', '전설', '영웅', '희귀']) {
+    if (gradeType.includes(g)) return g
+  }
+  return ''
+}
+
+// ===================================================================
 // 헬퍼
 // ===================================================================
 
@@ -89,10 +115,13 @@ function LineText({ line }: { line: TooltipLine }) {
 interface TooltipContentProps {
   parsed: ParsedTooltip
   icon: string
+  itemType?: string
 }
 
-function TooltipContent({ parsed, icon }: TooltipContentProps) {
+function TooltipContent({ parsed, icon, itemType = '' }: TooltipContentProps) {
   const { name, gradeType, quality, itemLevel, tier, classRestriction, sections } = parsed
+  const grade = extractGrade(gradeType)
+  const isArmor = ARMOR_TYPES.has(itemType)
 
   return (
     <div className="w-[260px] overflow-hidden rounded-lg border border-white/10 bg-[#181b23] shadow-2xl">
@@ -100,14 +129,22 @@ function TooltipContent({ parsed, icon }: TooltipContentProps) {
       <div className="flex items-start gap-2.5 p-3">
         {icon && (
           <div
-            className="relative h-11 w-11 shrink-0"
-            style={{
-              backgroundImage: `url(https://cdn-lostark.game.onstove.com/2018/obt/assets/images/common/game/bg_special_slot.png)`,
-              backgroundSize: '100% 100%',
-              backgroundColor: '#0d1117',
-            }}
+            className="relative h-11 w-11 shrink-0 overflow-hidden rounded-sm"
+            style={{ background: gradeBackground(grade) }}
           >
+            {/* Layer 2: 아이템 PNG */}
             <Image src={icon} alt={name} fill className="object-contain" sizes="44px" unoptimized />
+            {/* Layer 3: 방어구만 petBorder overlay */}
+            {isArmor && (
+              <Image
+                src={`${CDN}/bg_equipment_petBorder.png`}
+                alt=""
+                fill
+                className="pointer-events-none object-fill"
+                sizes="44px"
+                unoptimized
+              />
+            )}
           </div>
         )}
         <div className="min-w-0 flex-1">
@@ -164,11 +201,12 @@ function TooltipContent({ parsed, icon }: TooltipContentProps) {
 interface EquipmentTooltipProps {
   tooltipRaw: string
   icon: string
+  itemType?: string
   children: React.ReactNode
   side?: 'right' | 'left'
 }
 
-export function EquipmentTooltip({ tooltipRaw, icon, children, side = 'right' }: EquipmentTooltipProps) {
+export function EquipmentTooltip({ tooltipRaw, icon, itemType = '', children, side = 'right' }: EquipmentTooltipProps) {
   const parsed = parseTooltipJson(tooltipRaw)
   if (!parsed) return <>{children}</>
 
@@ -183,7 +221,7 @@ export function EquipmentTooltip({ tooltipRaw, icon, children, side = 'right' }:
           side === 'right' ? 'left-full ml-2' : 'right-full mr-2',
         ].join(' ')}
       >
-        <TooltipContent parsed={parsed} icon={icon} />
+        <TooltipContent parsed={parsed} icon={icon} itemType={itemType} />
       </div>
     </div>
   )

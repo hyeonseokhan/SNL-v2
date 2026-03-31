@@ -85,36 +85,80 @@ function OptionLine({ text }: { text: string }) {
 }
 
 // ===================================================================
-// 아이콘 (공식 방식 — PNG 내장 테두리 + bg_special_slot 오버레이)
+// 아이콘 (공식 전투정보실 방식 — 등급·슬롯별 테두리 이미지 오버레이)
 // ===================================================================
 
-/** 공식 전투정보실과 동일: 아이콘 위에 프레임 오버레이 적용 */
-const BG_SLOT_URL =
-  'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/common/game/bg_special_slot.png'
+const CDN = 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/common/game'
+
+/** 빈 슬롯 플레이스홀더 이미지 번호 (장비 미착용 시) */
+const EMPTY_SLOT_NUM: Record<string, number> = {
+  '투구': 1, '어깨': 2, '상의': 3, '하의': 4, '장갑': 5, '무기': 6,
+  '목걸이': 7, 'earing1': 8, 'earing2': 9, 'ring1': 10, 'ring2': 11,
+  '팔찌': 19, 'stone': 12,
+}
+
+/** 방어구 타입 여부 (overlay 사용 여부 결정) */
+const ARMOR_TYPES = new Set(['투구', '어깨', '상의', '하의', '장갑', '무기'])
+
+/**
+ * 등급별 배경 그라디언트
+ * 고대·유물은 KLOA getComputedStyle에서 직접 확인한 값
+ */
+function gradeBackground(grade: string): string {
+  switch (grade) {
+    case '고대': return 'linear-gradient(135deg, rgb(61,51,37), rgb(220,201,153))'
+    case '유물': return 'linear-gradient(135deg, rgb(52,26,9), rgb(162,64,6))'
+    case '전설': return 'linear-gradient(135deg, rgb(40,32,0), rgb(168,138,0))'
+    case '영웅': return 'linear-gradient(135deg, rgb(26,8,36), rgb(118,44,188))'
+    case '희귀': return 'linear-gradient(135deg, rgb(8,18,40), rgb(28,82,178))'
+    default:     return 'linear-gradient(135deg, rgb(18,20,26), rgb(45,48,58))'
+  }
+}
 
 function ItemIcon({
-  icon, name, tier, size = 36,
+  icon, name, tier, grade = '', itemType = '', size = 36,
 }: {
-  icon: string; name: string; tier: number; size?: number
+  icon: string; name: string; tier: number; grade?: string; itemType?: string; size?: number
 }) {
+  // 장비 미착용: 빈 슬롯 플레이스홀더
+  if (!icon) {
+    const slotN = itemType === 'orb' ? 'orb' : (EMPTY_SLOT_NUM[itemType] ?? 1)
+    const emptyUrl = itemType === 'orb'
+      ? `${CDN}/bg_equipment_slot_orb.png`
+      : `${CDN}/bg_equipment_slot${slotN}.png`
+    return (
+      <div
+        className="relative shrink-0"
+        style={{ width: size, height: size, backgroundImage: `url(${emptyUrl})`, backgroundSize: '100% 100%', backgroundColor: '#0d1117' }}
+      >
+        <TierBadge tier={tier} />
+      </div>
+    )
+  }
+
+  // 장비 착용: Layer1(등급 그라디언트 배경) + Layer2(아이템 PNG) + Layer3(방어구만 petBorder overlay)
+  const isArmor = ARMOR_TYPES.has(itemType)
   return (
     <div
-      className="relative shrink-0"
-      style={{
-        width: size,
-        height: size,
-        backgroundImage: `url(${BG_SLOT_URL})`,
-        backgroundSize: '100% 100%',
-        backgroundRepeat: 'no-repeat',
-        backgroundColor: '#0d1117',
-      }}
+      className="relative shrink-0 overflow-hidden rounded-sm"
+      style={{ width: size, height: size, background: gradeBackground(grade) }}
     >
-      {icon && (
+      {/* Layer 2: 아이템 PNG */}
+      <Image
+        src={icon}
+        alt={name}
+        fill
+        className="object-contain"
+        sizes={`${size}px`}
+        unoptimized
+      />
+      {/* Layer 3: 방어구에만 petBorder 오버레이 */}
+      {isArmor && (
         <Image
-          src={icon}
-          alt={name}
+          src={`${CDN}/bg_equipment_petBorder.png`}
+          alt=""
           fill
-          className="object-contain"
+          className="pointer-events-none object-fill"
           sizes={`${size}px`}
           unoptimized
         />
@@ -130,9 +174,9 @@ function ItemIcon({
 
 function ArmorRow({ item }: { item: EquipItem }) {
   return (
-    <EquipmentTooltip tooltipRaw={item.tooltipRaw} icon={item.icon} side="right">
+    <EquipmentTooltip tooltipRaw={item.tooltipRaw} icon={item.icon} itemType={item.type} side="right">
       <div className="flex cursor-default items-center gap-2">
-        <ItemIcon icon={item.icon} name={item.name} tier={item.tier} />
+        <ItemIcon icon={item.icon} name={item.name} tier={item.tier} grade={item.grade} itemType={item.type} />
         <div className="min-w-0 flex-1">
           <p className={`truncate text-[11px] font-medium leading-tight ${gradeNameColor(item.grade)}`}>
             {item.name || '—'}
@@ -155,17 +199,18 @@ function ArmorRow({ item }: { item: EquipItem }) {
 
 interface AccessoryRowProps {
   item: AccessoryInfo
+  itemType: string
   showEnlightenment?: boolean
   tooltipSide?: 'right' | 'left'
 }
 
-function AccessoryRow({ item, showEnlightenment = true, tooltipSide = 'left' }: AccessoryRowProps) {
+function AccessoryRow({ item, itemType, showEnlightenment = true, tooltipSide = 'left' }: AccessoryRowProps) {
   if (!item.name) return null
 
   return (
-    <EquipmentTooltip tooltipRaw={item.tooltipRaw} icon={item.icon} side={tooltipSide}>
+    <EquipmentTooltip tooltipRaw={item.tooltipRaw} icon={item.icon} itemType={itemType} side={tooltipSide}>
       <div className="flex cursor-default items-start gap-2">
-        <ItemIcon icon={item.icon} name={item.name} tier={item.tier} />
+        <ItemIcon icon={item.icon} name={item.name} tier={item.tier} grade={item.grade} itemType={itemType} />
 
         {/* 이름 + 품질 */}
         <div className="w-[120px] shrink-0">
@@ -196,9 +241,9 @@ function AccessoryRow({ item, showEnlightenment = true, tooltipSide = 'left' }: 
 function OrbRow({ item }: { item: NamedItem }) {
   if (!item.name) return null
   return (
-    <EquipmentTooltip tooltipRaw={item.tooltipRaw} icon={item.icon} side="right">
+    <EquipmentTooltip tooltipRaw={item.tooltipRaw} icon={item.icon} itemType="orb" side="right">
       <div className="flex cursor-default items-center gap-2">
-        <ItemIcon icon={item.icon} name={item.name} tier={0} />
+        <ItemIcon icon={item.icon} name={item.name} tier={0} grade={item.grade} itemType="orb" />
         <div className="min-w-0">
           <p className="text-[10px] text-white/30">보주</p>
           <p className={`truncate text-[11px] font-medium leading-tight ${gradeNameColor(item.grade)}`}>
@@ -217,9 +262,9 @@ function OrbRow({ item }: { item: NamedItem }) {
 function BangleRow({ item }: { item: AccessoryInfo }) {
   if (!item.name) return null
   return (
-    <EquipmentTooltip tooltipRaw={item.tooltipRaw} icon={item.icon} side="left">
+    <EquipmentTooltip tooltipRaw={item.tooltipRaw} icon={item.icon} itemType="팔찌" side="left">
       <div className="flex cursor-default items-start gap-2">
-        <ItemIcon icon={item.icon} name={item.name} tier={item.tier} />
+        <ItemIcon icon={item.icon} name={item.name} tier={item.tier} grade={item.grade} itemType="팔찌" />
         <div className="min-w-0">
           <p className={`truncate text-[11px] font-medium leading-tight ${gradeNameColor(item.grade)}`}>
             {item.name}
@@ -244,9 +289,9 @@ function BangleRow({ item }: { item: AccessoryInfo }) {
 function StoneRow({ item }: { item: AccessoryInfo }) {
   if (!item.name) return null
   return (
-    <EquipmentTooltip tooltipRaw={item.tooltipRaw} icon={item.icon} side="left">
+    <EquipmentTooltip tooltipRaw={item.tooltipRaw} icon={item.icon} itemType="stone" side="left">
       <div className="flex cursor-default items-start gap-2">
-        <ItemIcon icon={item.icon} name={item.name} tier={item.tier} />
+        <ItemIcon icon={item.icon} name={item.name} tier={item.tier} grade={item.grade} itemType="stone" />
 
         <div className="w-[120px] shrink-0">
           <p className={`truncate text-[11px] font-medium leading-tight ${gradeNameColor(item.grade)}`}>
@@ -308,8 +353,8 @@ export function CharacterEquipment({ armory }: CharacterEquipmentProps) {
 
         {/* 우: 목걸이/귀걸이×2/반지×2 */}
         <div className="space-y-2">
-          {accessories.map((item, i) => (
-            <AccessoryRow key={i} item={item} tooltipSide="left" />
+          {(['목걸이', 'earing1', 'earing2', 'ring1', 'ring2'] as const).map((type, i) => (
+            <AccessoryRow key={type} item={accessories[i]} itemType={type} tooltipSide="left" />
           ))}
           {/* 어빌리티 스톤 */}
           <StoneRow item={accessory.stone as AccessoryInfo} />
