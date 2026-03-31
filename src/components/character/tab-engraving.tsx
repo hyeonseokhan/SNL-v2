@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { CharData } from '@/types/character'
 
 interface TabEngravingProps {
@@ -10,42 +9,35 @@ export function TabEngraving({ data }: TabEngravingProps) {
 
   if (!engraving.length) {
     return (
-      <Card>
-        <CardContent className="py-8 text-center text-sm text-muted-foreground">
-          적용된 각인이 없습니다.
-        </CardContent>
-      </Card>
+      <div className="rounded-lg bg-card p-8 text-center text-sm text-muted-foreground">
+        적용된 각인이 없습니다.
+      </div>
     )
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base">각인</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {engraving.map((eng, i) => (
-            <div
-              key={i}
-              className="flex items-center gap-3 rounded-md bg-secondary/50 px-3 py-2"
-            >
-              {eng.icon && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={eng.icon}
-                  alt={eng.name}
-                  className="size-8 rounded"
-                />
-              )}
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{eng.name}</p>
-                <p className="text-xs text-muted-foreground">Lv. {eng.level}</p>
+    <div className="rounded-lg bg-card p-4">
+      <h3 className="mb-4 text-sm font-semibold text-primary">각인</h3>
+      <div className="space-y-2.5">
+        {engraving.map((eng, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-3 rounded-lg bg-secondary/50 p-3"
+          >
+            {eng.icon && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={eng.icon} alt="" className="size-9 rounded-lg" />
+            )}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">x {eng.level}</span>
+                <span className="text-sm">{eng.name}</span>
               </div>
             </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+            <span className="text-xs text-muted-foreground">Lv.{eng.level}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }

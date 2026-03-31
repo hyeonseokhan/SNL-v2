@@ -27,17 +27,15 @@ const tabs = [
 export function CharacterTabs({ data }: CharacterTabsProps) {
   return (
     <Tabs defaultValue="stats" className="w-full">
-      {/* --- 탭 네비게이션 --- */}
-      <TabsList className="w-full justify-start overflow-x-auto">
+      <TabsList variant="line" className="w-full justify-start overflow-x-auto border-b border-border/50">
         {tabs.map((tab) => (
-          <TabsTrigger key={tab.value} value={tab.value} className="text-sm">
+          <TabsTrigger key={tab.value} value={tab.value} className="text-sm px-4 py-2.5">
             {tab.label}
           </TabsTrigger>
         ))}
       </TabsList>
 
-      {/* --- 탭 콘텐츠 --- */}
-      <div className="mt-4">
+      <div className="mt-5">
         <TabsContent value="stats">
           <TabStats data={data} />
         </TabsContent>

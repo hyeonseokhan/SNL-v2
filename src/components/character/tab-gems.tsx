@@ -1,15 +1,16 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import type { CharData } from '@/types/character'
 
 interface TabGemsProps {
   data: CharData
 }
 
-const GRADE_BG: Record<string, string> = {
-  '전설': 'bg-amber-500/10 border-amber-500/30',
-  '유물': 'bg-orange-500/10 border-orange-500/30',
-  '영웅': 'bg-purple-500/10 border-purple-500/30',
+function gemGradeStyle(grade: string) {
+  switch (grade) {
+    case '전설': return 'border-amber-500/40 bg-amber-500/10'
+    case '유물': return 'border-orange-500/40 bg-orange-500/10'
+    case '영웅': return 'border-purple-500/40 bg-purple-500/10'
+    default: return 'border-border bg-secondary/30'
+  }
 }
 
 export function TabGems({ data }: TabGemsProps) {
@@ -17,58 +18,58 @@ export function TabGems({ data }: TabGemsProps) {
 
   if (!gem.length) {
     return (
-      <Card>
-        <CardContent className="py-8 text-center text-sm text-muted-foreground">
-          장착된 보석이 없습니다.
-        </CardContent>
-      </Card>
+      <div className="rounded-lg bg-card p-8 text-center text-sm text-muted-foreground">
+        장착된 보석이 없습니다.
+      </div>
     )
   }
 
-  // 보석 요약 (딜증/쿨감 개수)
   const damageCount = gem.filter((g) => g.type === 'damage').length
   const cooldownCount = gem.filter((g) => g.type === 'cooldown').length
 
   return (
     <div className="space-y-4">
-      {/* --- 보석 요약 --- */}
-      <div className="flex gap-3">
-        <Badge variant="secondary">겁화 {damageCount}</Badge>
-        <Badge variant="secondary">작열 {cooldownCount}</Badge>
-        <Badge variant="outline">총 {gem.length}개</Badge>
+      {/* --- 보석 그리드 --- */}
+      <div className="rounded-lg bg-card p-4">
+        <div className="mb-3 flex items-center gap-3">
+          <h3 className="text-sm font-semibold text-primary">보석</h3>
+          <div className="flex gap-2 text-xs text-muted-foreground">
+            <span>겁화 {damageCount}</span>
+            <span>·</span>
+            <span>작열 {cooldownCount}</span>
+          </div>
+        </div>
+
+        {/* KLOA 스타일: 가로 한 줄 그리드 */}
+        <div className="grid grid-cols-6 gap-2 sm:grid-cols-11">
+          {gem.map((g, i) => (
+            <div
+              key={i}
+              className={`relative flex aspect-square items-center justify-center rounded-lg border ${gemGradeStyle(g.grade)}`}
+            >
+              <span className="text-base font-bold tabular-nums">{g.level}</span>
+              <span className="absolute bottom-0.5 text-[8px] text-muted-foreground">
+                {g.type === 'cooldown' ? '작열' : '겁화'}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* --- 보석 그리드 --- */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">보석 목록</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-            {gem.map((g, i) => (
-              <div
-                key={i}
-                className={`rounded-lg border p-3 ${GRADE_BG[g.grade] ?? 'bg-secondary/30 border-border'}`}
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-lg font-bold">{g.level}</span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{g.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {g.type === 'cooldown' ? '작열' : '겁화'}
-                    </p>
-                  </div>
-                </div>
-                {g.effect && (
-                  <p className="mt-1.5 text-xs text-muted-foreground line-clamp-2">
-                    {g.effect}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {/* --- 보석 효과 상세 --- */}
+      <div className="rounded-lg bg-card p-4">
+        <h3 className="mb-3 text-sm font-semibold text-primary">보석 효과</h3>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {gem.map((g, i) => (
+            <div key={i} className="flex items-center gap-2 text-xs">
+              <span className={`flex size-6 shrink-0 items-center justify-center rounded font-bold ${gemGradeStyle(g.grade)}`}>
+                {g.level}
+              </span>
+              <span className="truncate text-muted-foreground">{g.effect || g.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
