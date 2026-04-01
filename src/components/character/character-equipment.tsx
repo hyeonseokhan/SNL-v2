@@ -85,7 +85,7 @@ function OptionLine({ text }: { text: string }) {
       {parts.map((part, i) =>
         /^(\+[\d,.]+%?|\d[\d,.]+%?)$/.test(part)
           ? <span key={i} className={optionColor(prefix)}>{part}</span>
-          : <span key={i} className="text-tx-label">{part}</span>
+          : <span key={i} className="text-black/80 dark:text-white/80">{part}</span>
       )}
     </p>
   )
