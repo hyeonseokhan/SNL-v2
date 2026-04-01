@@ -116,14 +116,16 @@ function LineText({ line }: { line: TooltipLine }) {
   const colorClass = LINE_COLOR[line.color] ?? "text-tx-body";
   const isColored = line.color !== "white" && line.color !== "gray";
 
-  // 각인 라인 ("[돌격대장] Lv.2"): 각인명에 색상, 나머지 기본색
+  // 각인 라인 ("[돌격대장] Lv.2"): 각인명만 색상, 대괄호·Lv는 기본색
   if ((line.color === "buff" || line.color === "red") && line.text.match(/^\[.+\]\s*Lv\.\d+$/)) {
-    const match = line.text.match(/^(\[.+\])\s*(Lv\.\d+)$/);
+    const match = line.text.match(/^\[(.+)\]\s*(Lv\.\d+)$/);
     if (match) {
+      const defaultColor = "text-black/80 dark:text-white/80";
       return (
         <span className="text-[11px] leading-none">
+          <span className={defaultColor}>[</span>
           <span className={colorClass}>{match[1]}</span>
-          <span className="text-black/80 dark:text-white/80"> {match[2]}</span>
+          <span className={defaultColor}>] {match[2]}</span>
         </span>
       );
     }

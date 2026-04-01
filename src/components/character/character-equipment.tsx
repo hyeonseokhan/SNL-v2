@@ -313,13 +313,13 @@ function StoneRow({ item }: { item: NamedItem & { option: string[]; engravings: 
       <div className="flex cursor-default items-start gap-2">
         <ItemIcon icon={item.icon} name={item.name} tier={item.tier} grade={item.grade} itemType="stone" />
 
-        <div className="w-[100px] shrink-0 space-y-0">
-          <p className={`truncate text-[11px] font-medium leading-none ${gradeNameColor(item.grade)}`}>
+        <div className="w-[100px] shrink-0 space-y-0.5">
+          <p className={`truncate text-[11px] font-medium leading-tight ${gradeNameColor(item.grade)}`}>
             {item.name}
           </p>
-          <p className="text-[10px] leading-none text-black/50 dark:text-white/50">Lv.5</p>
+          <p className="text-[10px] leading-tight text-black/50 dark:text-white/50">Lv.5</p>
           {item.levelBonus && (
-            <p className="text-[10px] leading-none">
+            <p className="text-[10px] leading-tight">
               {bonusParts.map((part, i) =>
                 /^\+[\d,.]+%?$/.test(part)
                   ? <span key={i} className="text-[#4CAF50] dark:text-[#73DC04]">{part}</span>
