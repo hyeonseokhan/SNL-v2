@@ -111,10 +111,27 @@ function QualityBar({ quality }: { quality: number }) {
 }
 
 function LineText({ line }: { line: TooltipLine }) {
+  const colorClass = LINE_COLOR[line.color] ?? "text-tx-body";
+  const isColored = line.color !== "white" && line.color !== "gray";
+
+  // 색상이 적용된 라인: 텍스트는 기본색, 수치만 색상 적용
+  if (isColored) {
+    const parts = line.text.split(/(\+[\d,.]+%?|-[\d,.]+%?)/);
+    return (
+      <span className="text-[11px] leading-none">
+        {parts.map((part, i) =>
+          /^[+-][\d,.]+%?$/.test(part) ? (
+            <span key={i} className={colorClass}>{part}</span>
+          ) : (
+            <span key={i} className="text-black/80 dark:text-white/80">{part}</span>
+          )
+        )}
+      </span>
+    );
+  }
+
   return (
-    <span
-      className={`text-[11px] leading-none ${LINE_COLOR[line.color] ?? "text-tx-body"}`}
-    >
+    <span className={`text-[11px] leading-none ${colorClass}`}>
       {line.text}
     </span>
   );
