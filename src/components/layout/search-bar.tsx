@@ -29,7 +29,7 @@ export function SearchBar({ size = 'sm', className }: SearchBarProps) {
     <form onSubmit={handleSubmit} className={className}>
       <div className="relative group">
         <Search
-          className={`absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary ${
+          className={`absolute left-3 top-1/2 -translate-y-1/2 text-tx-caption transition-colors group-focus-within:text-primary ${
             isLarge ? 'size-5' : 'size-4'
           }`}
         />
@@ -42,7 +42,7 @@ export function SearchBar({ size = 'sm', className }: SearchBarProps) {
             isLarge
               ? 'h-12 pl-11 pr-4 text-base'
               : 'h-9 pl-9 pr-3 text-sm'
-          } rounded-lg bg-card border-border/50 focus-visible:ring-1 focus-visible:ring-primary/50 focus-visible:border-primary/50 placeholder:text-muted-foreground/50`}
+          } rounded-lg bg-card border-border/50 focus-visible:ring-1 focus-visible:ring-primary/50 focus-visible:border-primary/50 placeholder:text-tx-muted`}
         />
       </div>
     </form>

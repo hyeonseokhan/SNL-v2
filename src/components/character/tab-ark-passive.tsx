@@ -39,7 +39,7 @@ function SectionCard({
 
       {/* 노드 목록 */}
       {section.nodes.length === 0 ? (
-        <p className="text-xs text-muted-foreground">데이터 없음</p>
+        <p className="text-xs text-tx-caption">데이터 없음</p>
       ) : (
         <div className="space-y-2.5">
           {Array.from(tiers.entries())
@@ -52,9 +52,9 @@ function SectionCard({
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={node.icon} alt="" className="size-6 rounded" />
                     )}
-                    <span className="text-xs text-muted-foreground">{tier}티어</span>
+                    <span className="text-xs text-tx-caption">{tier}티어</span>
                     <span className="text-xs font-medium">{node.name}</span>
-                    <span className="text-xs text-muted-foreground">Lv.{node.level}</span>
+                    <span className="text-xs text-tx-caption">Lv.{node.level}</span>
                   </div>
                 ))}
               </div>

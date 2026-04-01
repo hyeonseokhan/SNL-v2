@@ -15,7 +15,7 @@ export function TabCards({ data }: TabCardsProps) {
           <p className="font-medium">{card}</p>
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground">카드 세트 정보가 없습니다.</p>
+        <p className="text-sm text-tx-caption">카드 세트 정보가 없습니다.</p>
       )}
     </div>
   )

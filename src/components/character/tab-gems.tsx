@@ -18,7 +18,7 @@ export function TabGems({ data }: TabGemsProps) {
 
   if (!gem.length) {
     return (
-      <div className="rounded-lg bg-card p-8 text-center text-sm text-muted-foreground">
+      <div className="rounded-lg bg-card p-8 text-center text-sm text-tx-caption">
         장착된 보석이 없습니다.
       </div>
     )
@@ -33,7 +33,7 @@ export function TabGems({ data }: TabGemsProps) {
       <div className="rounded-lg bg-card p-4">
         <div className="mb-3 flex items-center gap-3">
           <h3 className="text-sm font-semibold text-primary">보석</h3>
-          <div className="flex gap-2 text-xs text-muted-foreground">
+          <div className="flex gap-2 text-xs text-tx-caption">
             <span>겁화 {damageCount}</span>
             <span>·</span>
             <span>작열 {cooldownCount}</span>
@@ -48,7 +48,7 @@ export function TabGems({ data }: TabGemsProps) {
               className={`relative flex aspect-square items-center justify-center rounded-lg border ${gemGradeStyle(g.grade)}`}
             >
               <span className="text-base font-bold tabular-nums">{g.level}</span>
-              <span className="absolute bottom-0.5 text-[8px] text-muted-foreground">
+              <span className="absolute bottom-0.5 text-[8px] text-tx-caption">
                 {g.type === 'cooldown' ? '작열' : '겁화'}
               </span>
             </div>
@@ -65,7 +65,7 @@ export function TabGems({ data }: TabGemsProps) {
               <span className={`flex size-6 shrink-0 items-center justify-center rounded font-bold ${gemGradeStyle(g.grade)}`}>
                 {g.level}
               </span>
-              <span className="truncate text-muted-foreground">{g.effect || g.name}</span>
+              <span className="truncate text-tx-caption">{g.effect || g.name}</span>
             </div>
           ))}
         </div>

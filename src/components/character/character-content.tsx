@@ -28,7 +28,7 @@ interface CharacterContentProps {
 
 function TabPlaceholder({ label }: { label: string }) {
   return (
-    <div className="flex h-40 items-center justify-center rounded-lg bg-card text-sm text-muted-foreground">
+    <div className="flex h-40 items-center justify-center rounded-lg bg-card text-sm text-tx-caption">
       {label} — 준비 중
     </div>
   )

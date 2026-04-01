@@ -44,7 +44,7 @@ export function CharacterMenu({ activeTab, onTabChange }: CharacterMenuProps) {
                 'shrink-0 px-4 py-2 text-xs font-medium transition-colors',
                 isActive
                   ? 'text-foreground'
-                  : 'text-muted-foreground hover:text-foreground/80',
+                  : 'text-tx-caption hover:text-foreground/80',
               ].join(' ')}
             >
               <span className="relative inline-block px-[4px]">

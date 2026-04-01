@@ -3,10 +3,13 @@ import { notFound } from 'next/navigation'
 import { CharacterProfile } from '@/components/character/character-profile'
 import { CharacterRanking } from '@/components/character/character-ranking'
 import { CharacterContent } from '@/components/character/character-content'
+import { CharCacheSync } from '@/components/character/char-cache-sync'
+import { MaintenancePage } from '@/components/character/maintenance-page'
 import { fetchCharacter, ApiError } from '@/lib/lostark-api'
 import { parseApiResponse } from '@/lib/api-parser'
 import { extractPalette } from '@/lib/extract-palette'
 import { fetchRanking } from '@/lib/korlark-api'
+import { getMaintenanceInfo } from '@/lib/maintenance'
 
 interface PageProps {
   params: Promise<{ name: string }>
@@ -34,7 +37,10 @@ export default async function CharacterPage({ params }: PageProps) {
     ])
 
     return (
-      <div className="mx-auto max-w-[1100px] px-4 pb-12 pt-6">
+      <div className="mx-auto w-[1100px] pb-12 pt-6">
+        {/* 조회 성공 시 localStorage에 캐싱 */}
+        <CharCacheSync name={decodedName} data={data} palette={palette} ranking={ranking} />
+
         <div className="flex gap-2">
           {/* 좌측 패널: 프로필 + 랭킹 */}
           <aside className="w-[272px] shrink-0 space-y-2">
@@ -55,6 +61,13 @@ export default async function CharacterPage({ params }: PageProps) {
     if (err instanceof ApiError && err.status === 404) {
       notFound()
     }
+
+    // 점검 시간이면 캐시 fallback 페이지로
+    const { isMaintenance, endsAt } = getMaintenanceInfo()
+    if (isMaintenance) {
+      return <MaintenancePage characterName={decodedName} endsAt={endsAt} />
+    }
+
     throw err
   }
 }

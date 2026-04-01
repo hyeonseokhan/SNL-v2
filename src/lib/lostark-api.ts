@@ -3,6 +3,8 @@
  * 서버 전용 — 클라이언트에서 직접 호출 금지
  */
 
+import fs from 'fs'
+
 const LA_BASE = 'https://developer-lostark.game.onstove.com'
 const LA_FILTERS =
   'profiles+equipment+combat-skills+engravings+gems+arkpassive+arkgrid+cards'
@@ -48,6 +50,16 @@ export class ApiError extends Error {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function fetchCharacter(name: string): Promise<any> {
+  // ── 개발용 mock (MOCK_CHAR=true 일 때) ──────────────────────────
+  if (process.env.MOCK_CHAR === 'true') {
+    const mockPath = process.env.MOCK_CHAR_PATH ?? ''
+    if (!mockPath) throw new Error('MOCK_CHAR_PATH 환경변수가 설정되지 않았습니다.')
+    const raw = fs.readFileSync(mockPath, 'utf-8')
+    console.log(`[mock] fetchCharacter("${name}") → ${mockPath}`)
+    return JSON.parse(raw)
+  }
+
+  // ── 실제 API 호출 ─────────────────────────────────────────────
   const url = `${LA_BASE}/armories/characters/${encodeURIComponent(name)}?filters=${LA_FILTERS}`
   const token = getToken()
 

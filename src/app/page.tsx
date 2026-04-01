@@ -8,7 +8,7 @@ export default function Home() {
         <h1 className="text-5xl font-bold tracking-tight text-primary sm:text-6xl">
           SNL
         </h1>
-        <p className="text-muted-foreground text-base">
+        <p className="text-tx-caption text-base">
           로스트아크 캐릭터 조회
         </p>
       </div>
@@ -17,7 +17,7 @@ export default function Home() {
       <SearchBar size="lg" className="w-full max-w-md" />
 
       {/* --- 안내 --- */}
-      <p className="text-xs text-muted-foreground/60">
+      <p className="text-xs text-tx-muted">
         캐릭터 이름을 입력하면 장비, 스킬, 보석 등 상세 정보를 확인할 수 있습니다.
       </p>
     </div>

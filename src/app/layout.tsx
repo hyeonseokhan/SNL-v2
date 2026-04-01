@@ -22,7 +22,7 @@ export default function RootLayout({
       <body className="min-h-dvh bg-background font-sans antialiased">
         <ThemeProvider>
           <Header />
-          <main className="mx-auto w-full max-w-5xl px-4">{children}</main>
+          <main>{children}</main>
         </ThemeProvider>
       </body>
     </html>

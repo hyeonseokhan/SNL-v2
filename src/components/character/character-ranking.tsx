@@ -43,18 +43,18 @@ function RankSection({
     <div className="space-y-[3px] text-[11px]">
       {/* 1행: 서버명 + 순위 */}
       <div className="flex items-center justify-between gap-2">
-        <span className="text-white/45">{label}</span>
+        <span className="text-tx-caption">{label}</span>
         <div className="flex items-center gap-1.5 whitespace-nowrap">
-          <span className="tabular-nums text-white/80">{toRank(overall.value)}</span>
-          <span className="text-[10px] text-white/35">{toPercent(overall.position)}</span>
+          <span className="tabular-nums text-tx-body">{toRank(overall.value)}</span>
+          <span className="text-[10px] text-tx-muted">{toPercent(overall.position)}</span>
         </div>
       </div>
       {/* 2행: 클래스 순위 */}
       <div className="flex items-center justify-between gap-2">
-        <span className="text-white/30">클래스</span>
+        <span className="text-tx-muted">클래스</span>
         <div className="flex items-center gap-1.5 whitespace-nowrap">
-          <span className="tabular-nums text-white/70">{toRank(job.value)}</span>
-          <span className="text-[10px] text-white/30">{toPercent(job.position)}</span>
+          <span className="tabular-nums text-tx-label">{toRank(job.value)}</span>
+          <span className="text-[10px] text-tx-muted">{toPercent(job.position)}</span>
         </div>
       </div>
     </div>

@@ -9,7 +9,7 @@ export function TabEngraving({ data }: TabEngravingProps) {
 
   if (!engraving.length) {
     return (
-      <div className="rounded-lg bg-card p-8 text-center text-sm text-muted-foreground">
+      <div className="rounded-lg bg-card p-8 text-center text-sm text-tx-caption">
         적용된 각인이 없습니다.
       </div>
     )
@@ -34,7 +34,7 @@ export function TabEngraving({ data }: TabEngravingProps) {
                 <span className="text-sm">{eng.name}</span>
               </div>
             </div>
-            <span className="text-xs text-muted-foreground">Lv.{eng.level}</span>
+            <span className="text-xs text-tx-caption">Lv.{eng.level}</span>
           </div>
         ))}
       </div>

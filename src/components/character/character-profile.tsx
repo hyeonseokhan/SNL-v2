@@ -101,12 +101,12 @@ function TagList({ items }: { items: TagItem[] }) {
           className="flex items-center gap-1.5 text-[12px] leading-tight"
           style={{ textShadow: '0 1px 3px rgba(0,0,0,0.95)' }}
         >
-          <span className="w-[38px] shrink-0 text-white/55">{label}</span>
+          <span className="w-[38px] shrink-0 text-white/50">{label}</span>
           <span className="flex items-center gap-[2px]">
             {icon && (
               <Image src={icon} alt="" width={16} height={16} className="shrink-0 object-contain" style={{ width: 16, height: 'auto' }} />
             )}
-            <span className="text-white/85">{value}</span>
+            <span className="text-white/80">{value}</span>
           </span>
         </li>
       ))}
@@ -198,12 +198,12 @@ export function CharacterProfile({ data, palette }: CharacterProfileProps) {
       <div className="absolute inset-y-0 left-0 flex w-[62%] flex-col px-4 py-5">
         {/* 레벨 · 직업 · 깨달음 태그 (한 줄) */}
         <p
-          className="text-[11px] font-medium text-white/90"
+          className="text-[11px] font-medium text-white/80"
           style={{ textShadow: '0 1px 4px rgba(0,0,0,0.95)' }}
         >
           Lv.{profile.characterLevel}&nbsp;&nbsp;{profile.class}
           {enlightenmentTag && (
-            <span className="text-white/65">&nbsp;&nbsp;#{enlightenmentTag}</span>
+            <span className="text-white/50">&nbsp;&nbsp;#{enlightenmentTag}</span>
           )}
         </p>
 

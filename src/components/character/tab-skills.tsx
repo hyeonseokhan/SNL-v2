@@ -10,7 +10,7 @@ export function TabSkills({ data }: TabSkillsProps) {
 
   if (!activeSkills.length) {
     return (
-      <div className="rounded-lg bg-card p-8 text-center text-sm text-muted-foreground">
+      <div className="rounded-lg bg-card p-8 text-center text-sm text-tx-caption">
         등록된 스킬이 없습니다.
       </div>
     )
@@ -26,14 +26,14 @@ export function TabSkills({ data }: TabSkillsProps) {
           <div key={i} className="rounded-lg bg-secondary/50 p-3">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium">{skill.name}</span>
-              <span className="rounded bg-secondary px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-muted-foreground">
+              <span className="rounded bg-secondary px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-tx-caption">
                 Lv.{skill.level}
               </span>
             </div>
             {skill.tripods.length > 0 && (
               <div className="mt-1.5 flex flex-wrap gap-1">
                 {skill.tripods.map((t, j) => (
-                  <span key={j} className="text-[10px] text-muted-foreground">
+                  <span key={j} className="text-[10px] text-tx-caption">
                     {t.name}
                   </span>
                 ))}

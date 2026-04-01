@@ -51,10 +51,17 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
+  /* ── 텍스트 계층 (라이트) ── */
+  --tx-title:   oklch(0.10 0 0);
+  --tx-body:    oklch(0.20 0 0);
+  --tx-label:   oklch(0.40 0 0);
+  --tx-caption: oklch(0.55 0 0);
+  --tx-muted:   oklch(0.65 0 0);
+
+  --background: oklch(0.955 0.006 280);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.13 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.205 0 0);
@@ -86,6 +93,13 @@
 }
 
 .dark {
+  /* ── 텍스트 계층 (다크) ── */
+  --tx-title:   oklch(1 0 0 / 0.95);
+  --tx-body:    oklch(1 0 0 / 0.80);
+  --tx-label:   oklch(1 0 0 / 0.60);
+  --tx-caption: oklch(1 0 0 / 0.45);
+  --tx-muted:   oklch(1 0 0 / 0.30);
+
   /* KLOA 실제 색상값 기반 */
   --background: oklch(0.19 0.03 283);
   --foreground: oklch(1 0 0 / 0.87);
@@ -125,6 +139,12 @@
 }
 
 @theme inline {
+  --color-tx-title:   var(--tx-title);
+  --color-tx-body:    var(--tx-body);
+  --color-tx-label:   var(--tx-label);
+  --color-tx-caption: var(--tx-caption);
+  --color-tx-muted:   var(--tx-muted);
+
   --color-elevated: var(--elevated, var(--card));
   --color-stat-value: var(--stat-value, var(--foreground));
   --color-stat-muted: var(--stat-muted, var(--muted-foreground));

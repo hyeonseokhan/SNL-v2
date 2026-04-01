@@ -52,7 +52,7 @@ function EquipmentSection({ data }: { data: CharData }) {
                   <div className="h-1 w-12 rounded-full bg-muted overflow-hidden">
                     <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-400" style={{ width: `${weapon.quality}%` }} />
                   </div>
-                  <span className="text-[11px] tabular-nums text-muted-foreground">{weapon.quality}</span>
+                  <span className="text-[11px] tabular-nums text-tx-caption">{weapon.quality}</span>
                 </div>
               </div>
             </div>
@@ -61,8 +61,8 @@ function EquipmentSection({ data }: { data: CharData }) {
           {/* 팔찌 */}
           {acc.bangle.option.length > 0 && (
             <div className="border-t border-border/30 pt-3">
-              <p className="mb-1 text-xs font-medium text-muted-foreground">팔찌</p>
-              <p className="text-[11px] leading-relaxed text-muted-foreground">{acc.bangle.option.join(' ')}</p>
+              <p className="mb-1 text-xs font-medium text-tx-caption">팔찌</p>
+              <p className="text-[11px] leading-relaxed text-tx-caption">{acc.bangle.option.join(' ')}</p>
             </div>
           )}
 
@@ -74,7 +74,7 @@ function EquipmentSection({ data }: { data: CharData }) {
               { label: '보주', value: acc.orb.name },
             ].filter(x => x.value).map(({ label, value }) => (
               <div key={label} className="flex gap-2">
-                <span className="text-muted-foreground">{label}</span>
+                <span className="text-tx-caption">{label}</span>
                 <span className="truncate">{value}</span>
               </div>
             ))}
@@ -85,7 +85,7 @@ function EquipmentSection({ data }: { data: CharData }) {
         <div className="space-y-2.5">
           {accessories.map(({ label, item }, i) => (
             <div key={i} className="flex gap-x-2">
-              <div className="flex size-11 shrink-0 items-center justify-center rounded-md bg-secondary text-[10px] text-muted-foreground">
+              <div className="flex size-11 shrink-0 items-center justify-center rounded-md bg-secondary text-[10px] text-tx-caption">
                 {label}
               </div>
               <div className="min-w-0 flex-1 text-[11px] leading-relaxed">
@@ -100,7 +100,7 @@ function EquipmentSection({ data }: { data: CharData }) {
                     )
                   })
                 ) : (
-                  <p className="text-muted-foreground/30">-</p>
+                  <p className="text-tx-muted">-</p>
                 )}
               </div>
             </div>
@@ -134,7 +134,7 @@ function GemsSection({ data }: { data: CharData }) {
           )
         })}
       </div>
-      <div className="mt-2 flex items-center justify-center gap-x-6 pb-2 text-xs text-muted-foreground">
+      <div className="mt-2 flex items-center justify-center gap-x-6 pb-2 text-xs text-tx-caption">
         <span>겁화 {damageCount}</span>
         <span>작열 {cooldownCount}</span>
       </div>
@@ -187,7 +187,7 @@ function StatsAndEngravingSection({ data }: { data: CharData }) {
               )}
             </div>
           )) : (
-            <p className="text-xs text-muted-foreground">각인 없음</p>
+            <p className="text-xs text-tx-caption">각인 없음</p>
           )}
         </div>
       </div>
@@ -215,14 +215,14 @@ function CombatStatsSection({ data }: { data: CharData }) {
     <div className="rounded-lg bg-card px-[17px] py-4 shadow-[1px_1px_10px_0_rgba(72,75,108,0.08)]">
       <div className="mb-3 flex items-center justify-between">
         <SectionLabel>전투 특성</SectionLabel>
-        <span className="text-xs text-muted-foreground">합계 {total.toLocaleString()}</span>
+        <span className="text-xs text-tx-caption">합계 {total.toLocaleString()}</span>
       </div>
       <div className="grid grid-cols-6 text-center">
         {statEntries.map(({ label, value }) => {
           const isMain = value > 100
           return (
             <div key={label}>
-              <p className="text-xs text-muted-foreground">{label}</p>
+              <p className="text-xs text-tx-caption">{label}</p>
               <p className={`mt-1 text-base font-medium tabular-nums ${isMain ? 'text-stat-value' : 'text-stat-muted'}`}>
                 {value.toLocaleString()}
               </p>
@@ -261,7 +261,7 @@ function ArkPassiveColumn({
         </span>
         <span className="text-sm font-bold tabular-nums">{section.points} 포인트</span>
       </div>
-      <div className="text-xs text-muted-foreground mb-2">
+      <div className="text-xs text-tx-caption mb-2">
         | 6랭크
       </div>
       <div className="space-y-1.5">
@@ -271,13 +271,13 @@ function ArkPassiveColumn({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={node.icon} alt="" className="size-5 rounded" />
             )}
-            <span className="text-xs text-muted-foreground">{node.tier}티어</span>
+            <span className="text-xs text-tx-caption">{node.tier}티어</span>
             <span className="text-xs font-medium">{node.name}</span>
-            <span className="text-xs text-muted-foreground">Lv.{node.level}</span>
+            <span className="text-xs text-tx-caption">Lv.{node.level}</span>
           </div>
         ))}
         {section.nodes.length === 0 && (
-          <p className="text-xs text-muted-foreground/40">데이터 없음</p>
+          <p className="text-xs text-tx-muted">데이터 없음</p>
         )}
       </div>
     </div>

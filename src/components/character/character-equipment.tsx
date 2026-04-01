@@ -16,21 +16,24 @@ import type { ArmoryData, EquipItem, AccessoryInfo, NamedItem } from '@/types/ch
 
 function gradeNameColor(grade: string): string {
   switch (grade) {
-    case '고대':   return 'text-[#E3C7A1]'
-    case '유물':   return 'text-[#FA5D00]'
-    case '전설':   return 'text-[#FFD200]'
-    case '영웅':   return 'text-purple-400'
-    case '희귀':   return 'text-blue-400'
-    default:       return 'text-white/70'
+    case '고대':   return 'text-[#7A5C1E] dark:text-[#E3C7A1]'
+    case '유물':   return 'text-[#C44A00] dark:text-[#FA5D00]'
+    case '전설':   return 'text-[#9A7A00] dark:text-[#FFD200]'
+    case '영웅':   return 'text-purple-700 dark:text-purple-400'
+    case '희귀':   return 'text-blue-700 dark:text-blue-400'
+    default:       return 'text-tx-body'
   }
 }
 
-function qualityBg(q: number): string {
-  if (q >= 100) return 'bg-amber-500 text-black'
-  if (q >= 75)  return 'bg-sky-600 text-white'
-  if (q >= 25)  return 'bg-yellow-600 text-white'
-  if (q >= 1)   return 'bg-red-700 text-white'
-  return 'bg-white/10 text-white/40'
+/** 공식 전투정보실 q0-q6 색상 시스템 */
+function qualityColor(q: number): string {
+  if (q === 100) return '#fe9600'  // q6
+  if (q > 89)    return '#ce43fc'  // q5
+  if (q > 69)    return '#00b5ff'  // q4
+  if (q > 29)    return '#91fe02'  // q3
+  if (q > 9)     return '#ffd200'  // q2
+  if (q >= 1)    return '#ff6000'  // q1
+  return 'rgba(255,255,255,0.2)'   // q0
 }
 
 function optionColor(prefix: string): string {
@@ -38,7 +41,7 @@ function optionColor(prefix: string): string {
     case '상': return 'text-[#FE9600]'
     case '중': return 'text-[#CE43FC]'
     case '하': return 'text-[#00B5FF]'
-    default:   return 'text-white/60'
+    default:   return 'text-tx-label'
   }
 }
 
@@ -50,7 +53,7 @@ function optionColor(prefix: string): string {
 function TierBadge({ tier }: { tier: number }) {
   if (!tier) return null
   return (
-    <span className="absolute left-0 top-0 z-10 rounded-br rounded-tl-sm bg-black/80 px-[3px] py-[1px] text-[9px] font-bold leading-none text-white/60">
+    <span className="absolute left-0 top-0 z-10 rounded-br rounded-tl-sm bg-black px-[3px] py-[1px] text-[9px] font-bold leading-none text-white">
       T{tier}
     </span>
   )
@@ -59,8 +62,12 @@ function TierBadge({ tier }: { tier: number }) {
 /** 품질 수치 배지 */
 function QualityBadge({ quality }: { quality: number }) {
   if (quality < 0) return null
+  const color = qualityColor(quality)
   return (
-    <span className={`rounded px-1.5 py-[2px] text-[10px] font-bold tabular-nums leading-none ${qualityBg(quality)}`}>
+    <span
+      className="rounded px-1.5 py-[2px] text-[10px] font-bold tabular-nums leading-none"
+      style={{ color, border: `1px solid ${color}40`, backgroundColor: `${color}18` }}
+    >
       {quality}
     </span>
   )
@@ -78,7 +85,7 @@ function OptionLine({ text }: { text: string }) {
       {parts.map((part, i) =>
         /^(\+[\d,.]+%?|\d[\d,.]+%?)$/.test(part)
           ? <span key={i} className={optionColor(prefix)}>{part}</span>
-          : <span key={i} className="text-white/70">{part}</span>
+          : <span key={i} className="text-tx-label">{part}</span>
       )}
     </p>
   )
@@ -184,7 +191,9 @@ function ArmorRow({ item }: { item: EquipItem }) {
           <div className="mt-0.5 flex items-center gap-1.5">
             <QualityBadge quality={item.quality} />
             {item.itemLevel > 0 && (
-              <span className="text-[10px] text-white/35">{item.itemLevel}</span>
+              <span className="text-[10px] text-tx-muted">
+                <span className="text-[8px]">·</span> iLv {item.itemLevel}
+              </span>
             )}
           </div>
         </div>
@@ -213,14 +222,14 @@ function AccessoryRow({ item, itemType, showEnlightenment = true, tooltipSide = 
         <ItemIcon icon={item.icon} name={item.name} tier={item.tier} grade={item.grade} itemType={itemType} />
 
         {/* 이름 + 품질 */}
-        <div className="w-[120px] shrink-0">
+        <div className="w-[100px] shrink-0">
           <p className={`truncate text-[11px] font-medium leading-tight ${gradeNameColor(item.grade)}`}>
             {item.name}
           </p>
           <div className="mt-0.5 flex items-center gap-1.5">
             <QualityBadge quality={item.quality} />
             {showEnlightenment && item.enlightenment > 0 && (
-              <span className="text-[10px] text-white/35">깨달음 +{item.enlightenment}</span>
+              <span className="text-[10px] text-tx-muted">깨달음 +{item.enlightenment}</span>
             )}
           </div>
         </div>
@@ -245,7 +254,7 @@ function OrbRow({ item }: { item: NamedItem }) {
       <div className="flex cursor-default items-center gap-2">
         <ItemIcon icon={item.icon} name={item.name} tier={0} grade={item.grade} itemType="orb" />
         <div className="min-w-0">
-          <p className="text-[10px] text-white/30">보주</p>
+          <p className="text-[10px] text-tx-muted">보주</p>
           <p className={`truncate text-[11px] font-medium leading-tight ${gradeNameColor(item.grade)}`}>
             {item.name}
           </p>
@@ -271,7 +280,7 @@ function BangleRow({ item }: { item: AccessoryInfo }) {
           </p>
           <div className="mt-1 flex flex-wrap gap-1">
             {item.option.map((opt, i) => (
-              <span key={i} className="rounded bg-white/10 px-1.5 py-[2px] text-[10px] text-white/70">
+              <span key={i} className="rounded bg-white/10 px-1.5 py-[2px] text-[10px] text-tx-label">
                 {opt}
               </span>
             ))}
@@ -293,12 +302,12 @@ function StoneRow({ item }: { item: AccessoryInfo }) {
       <div className="flex cursor-default items-start gap-2">
         <ItemIcon icon={item.icon} name={item.name} tier={item.tier} grade={item.grade} itemType="stone" />
 
-        <div className="w-[120px] shrink-0">
+        <div className="w-[100px] shrink-0">
           <p className={`truncate text-[11px] font-medium leading-tight ${gradeNameColor(item.grade)}`}>
             {item.name}
           </p>
           <div className="mt-0.5">
-            <span className="text-[10px] text-white/35">Lv.{item.quality >= 0 ? item.quality : 5}</span>
+            <span className="text-[10px] text-tx-muted">Lv.{item.quality >= 0 ? item.quality : 5}</span>
           </div>
         </div>
 
@@ -340,10 +349,10 @@ export function CharacterEquipment({ armory }: CharacterEquipmentProps) {
   ]
 
   return (
-    <div className="rounded-lg bg-card p-4 shadow-[1px_1px_10px_0_rgba(72,75,108,0.08)]">
+    <div className="rounded-lg bg-card p-3 shadow-[1px_1px_10px_0_rgba(72,75,108,0.08)]">
 
       {/* ── 상단: 방어구(좌) + 악세서리(우) ── */}
-      <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+      <div className="grid grid-cols-[5fr_6fr] gap-x-2 gap-y-2">
         {/* 좌: 방어구 6종 */}
         <div className="space-y-2">
           {armorSorted.map((item) => (
@@ -351,12 +360,11 @@ export function CharacterEquipment({ armory }: CharacterEquipmentProps) {
           ))}
         </div>
 
-        {/* 우: 목걸이/귀걸이×2/반지×2 */}
+        {/* 우: 목걸이/귀걸이×2/반지×2 + 스톤 */}
         <div className="space-y-2">
           {(['목걸이', 'earing1', 'earing2', 'ring1', 'ring2'] as const).map((type, i) => (
             <AccessoryRow key={type} item={accessories[i]} itemType={type} tooltipSide="left" />
           ))}
-          {/* 어빌리티 스톤 */}
           <StoneRow item={accessory.stone as AccessoryInfo} />
         </div>
       </div>
@@ -365,7 +373,7 @@ export function CharacterEquipment({ armory }: CharacterEquipmentProps) {
       <div className="my-3 h-px bg-white/[0.06]" />
 
       {/* ── 하단: 보주(좌) + 팔찌(우) ── */}
-      <div className="grid grid-cols-2 gap-x-4">
+      <div className="grid grid-cols-[5fr_6fr] gap-x-2">
         <div>
           <OrbRow item={accessory.orb} />
         </div>

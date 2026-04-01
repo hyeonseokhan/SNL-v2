@@ -51,16 +51,16 @@ const LINE_COLOR: Record<string, string> = {
   legendary: 'text-[#FFD200]',
   red:       'text-[#C24B46]',
   teal:      'text-[#5FD3F1]',
-  white:     'text-white/90',
-  gray:      'text-white/35',
+  white:     'text-tx-body',
+  gray:      'text-tx-muted',
 }
 
 const GRADE_NAME_COLOR: Record<string, string> = {
-  '고대':   'text-[#E3C7A1]',
-  '유물':   'text-[#FA5D00]',
-  '전설':   'text-[#FFD200]',
-  '영웅':   'text-purple-400',
-  '희귀':   'text-blue-400',
+  '고대':   'text-[#7A5C1E] dark:text-[#E3C7A1]',
+  '유물':   'text-[#C44A00] dark:text-[#FA5D00]',
+  '전설':   'text-[#9A7A00] dark:text-[#FFD200]',
+  '영웅':   'text-purple-700 dark:text-purple-400',
+  '희귀':   'text-blue-700 dark:text-blue-400',
 }
 
 function gradeNameColor(gradeType: string): string {
@@ -86,7 +86,7 @@ function QualityBar({ quality }: { quality: number }) {
   const pct = Math.max(0, Math.min(100, quality))
   return (
     <div className="flex items-center gap-2 text-[11px]">
-      <span className="text-white/40">품질</span>
+      <span className="text-tx-caption">품질</span>
       <div className="h-1.5 w-24 overflow-hidden rounded-full bg-white/10">
         <div
           className={`h-full rounded-full ${qualityBarColor(quality)}`}
@@ -102,7 +102,7 @@ function QualityBar({ quality }: { quality: number }) {
 
 function LineText({ line }: { line: TooltipLine }) {
   return (
-    <span className={`text-[11px] leading-[1.5] ${LINE_COLOR[line.color] ?? 'text-white/80'}`}>
+    <span className={`text-[11px] leading-[1.5] ${LINE_COLOR[line.color] ?? 'text-tx-body'}`}>
       {line.text}
     </span>
   )
@@ -155,7 +155,7 @@ function TooltipContent({ parsed, icon, itemType = '' }: TooltipContentProps) {
             {gradeType}
           </p>
           {(itemLevel > 0 || tier > 0) && (
-            <p className="mt-0.5 text-[10px] text-white/40">
+            <p className="mt-0.5 text-[10px] text-tx-caption">
               {itemLevel > 0 && `아이템 레벨 ${itemLevel.toLocaleString()}`}
               {tier > 0 && ` (티어 ${tier})`}
             </p>
@@ -173,7 +173,7 @@ function TooltipContent({ parsed, icon, itemType = '' }: TooltipContentProps) {
       {/* 클래스 전용 */}
       {classRestriction && (
         <div className="border-t border-white/[0.07] px-3 py-1.5">
-          <span className="text-[11px] text-white/40">{classRestriction}</span>
+          <span className="text-[11px] text-tx-caption">{classRestriction}</span>
         </div>
       )}
 

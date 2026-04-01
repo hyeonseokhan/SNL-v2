@@ -51,7 +51,7 @@ export function TabEquipment({ data }: TabEquipmentProps) {
                       className="h-1.5 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400"
                       style={{ width: `${weapon.quality}px`, maxWidth: '100px' }}
                     />
-                    <span className="text-xs tabular-nums text-muted-foreground">{weapon.quality}</span>
+                    <span className="text-xs tabular-nums text-tx-caption">{weapon.quality}</span>
                   </div>
                   <Badge variant="outline" className={`text-[10px] ${gradeClass(weapon.grade)}`}>
                     {weapon.grade}
@@ -60,7 +60,7 @@ export function TabEquipment({ data }: TabEquipmentProps) {
               </div>
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">미장착</p>
+            <p className="text-sm text-tx-caption">미장착</p>
           )}
         </div>
 
@@ -76,7 +76,7 @@ export function TabEquipment({ data }: TabEquipmentProps) {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">미장착</p>
+            <p className="text-sm text-tx-caption">미장착</p>
           )}
         </div>
 
@@ -90,8 +90,8 @@ export function TabEquipment({ data }: TabEquipmentProps) {
               { label: '보주', value: acc.orb.name },
             ].map(({ label, value }) => (
               <div key={label} className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">{label}</span>
-                <span className={value ? '' : 'text-muted-foreground/40'}>{value || '-'}</span>
+                <span className="text-tx-caption">{label}</span>
+                <span className={value ? '' : 'text-tx-muted'}>{value || '-'}</span>
               </div>
             ))}
           </div>
@@ -104,7 +104,7 @@ export function TabEquipment({ data }: TabEquipmentProps) {
         <div className="space-y-3">
           {accessories.map(({ label, data: item }, i) => (
             <div key={i} className="flex items-start gap-3 rounded-md bg-secondary/50 p-2.5">
-              <div className="flex size-9 shrink-0 items-center justify-center rounded bg-secondary text-[10px] font-medium text-muted-foreground">
+              <div className="flex size-9 shrink-0 items-center justify-center rounded bg-secondary text-[10px] font-medium text-tx-caption">
                 {label}
               </div>
               <div className="min-w-0 flex-1">
@@ -115,7 +115,7 @@ export function TabEquipment({ data }: TabEquipmentProps) {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-muted-foreground/40">미장착</p>
+                  <p className="text-xs text-tx-muted">미장착</p>
                 )}
               </div>
             </div>

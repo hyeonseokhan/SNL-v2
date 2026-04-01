@@ -129,7 +129,7 @@ function parseEquipment(equipment: any[]) {
   function itemLevelAndTier(item: any): { itemLevel: number; tier: number } {
     if (!item) return { itemLevel: 0, tier: 0 }
     const t = parseTooltip(item.Tooltip)
-    const raw = stripHtml(t.Element_000?.value?.leftStr2 ?? '')
+    const raw = stripHtml(t.Element_001?.value?.leftStr2 ?? '')
     const lvMatch = raw.match(/아이템 레벨\s+([\d,]+)/)
     const tierMatch = raw.match(/티어\s*(\d+)/)
     return {

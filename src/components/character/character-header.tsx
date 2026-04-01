@@ -38,7 +38,7 @@ export function CharacterHeader({ data }: CharacterHeaderProps) {
         {/* --- 캐릭터 정보 --- */}
         <div className="flex flex-1 flex-col justify-center gap-3 p-5 sm:p-6">
           {/* 상단: 레벨 + 클래스 */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 text-sm text-tx-caption">
             <span>Lv. {profile.characterLevel}</span>
             <span>{profile.class}</span>
             {profile.title && (
@@ -57,13 +57,13 @@ export function CharacterHeader({ data }: CharacterHeaderProps) {
           {/* 아이템 레벨 + 전투력 */}
           <div className="flex items-baseline gap-4">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs text-muted-foreground">⚔</span>
+              <span className="text-xs text-tx-caption">⚔</span>
               <span className="text-xl font-bold text-amber-400">
                 {profile.itemLevel.toLocaleString('ko-KR', { minimumFractionDigits: 2 })}
               </span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-xs text-muted-foreground">⚡</span>
+              <span className="text-xs text-tx-caption">⚡</span>
               <span className="text-lg font-semibold text-emerald-400">
                 {stats.combatPower.toLocaleString()}
               </span>
@@ -71,7 +71,7 @@ export function CharacterHeader({ data }: CharacterHeaderProps) {
           </div>
 
           {/* 하단 정보 */}
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-tx-caption">
             <span>서버 {profile.serverName}</span>
             {profile.guildName && <span>길드 {profile.guildName}</span>}
           </div>
@@ -89,8 +89,8 @@ export function CharacterHeader({ data }: CharacterHeaderProps) {
               { label: '숙련', value: stats.expert },
             ].map(({ label, value }) => (
               <div key={label} className="flex items-center gap-3">
-                <span className="w-8 text-muted-foreground">{label}</span>
-                <span className={`font-semibold tabular-nums ${value > 100 ? 'text-foreground' : 'text-muted-foreground/50'}`}>
+                <span className="w-8 text-tx-caption">{label}</span>
+                <span className={`font-semibold tabular-nums ${value > 100 ? 'text-foreground' : 'text-tx-muted'}`}>
                   {value.toLocaleString()}
                 </span>
               </div>

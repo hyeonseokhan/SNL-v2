@@ -17,7 +17,7 @@ const tabs = [
 
 function TabPlaceholder({ label }: { label: string }) {
   return (
-    <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
+    <div className="flex h-40 items-center justify-center text-sm text-tx-caption">
       {label} — 준비 중
     </div>
   )
