@@ -295,20 +295,13 @@ function BangleRow({ item }: { item: AccessoryInfo }) {
 // 어빌리티 스톤 행
 // ===================================================================
 
-function StoneEngravingBadge({ eng }: { eng: StoneEngraving }) {
-  const bgColor = eng.isNegative
-    ? 'bg-red-900/60 text-red-300'
-    : 'bg-blue-900/60 text-blue-300'
-  const numColor = eng.isNegative
-    ? 'bg-red-600'
-    : 'bg-blue-600'
+function StoneEngravingLine({ eng }: { eng: StoneEngraving }) {
+  const lvColor = eng.isNegative ? 'text-[#C24B46]' : 'text-[#00B5FF]'
   return (
-    <div className={`flex items-center gap-1 rounded px-1.5 py-0.5 ${bgColor}`}>
-      <span className={`inline-flex h-[14px] min-w-[14px] items-center justify-center rounded-sm text-[9px] font-bold text-white ${numColor}`}>
-        {eng.level}
-      </span>
-      <span className="text-[10px] text-black/80 dark:text-white/80">{eng.name}</span>
-    </div>
+    <p className="whitespace-nowrap text-[10px] leading-[1.45]">
+      <span className="text-black/80 dark:text-white/80">{eng.name} </span>
+      <span className={lvColor}>Lv.{eng.level}</span>
+    </p>
   )
 }
 
@@ -316,8 +309,8 @@ function StoneRow({ item }: { item: NamedItem & { option: string[]; engravings: 
   if (!item.name) return null
   return (
     <EquipmentTooltip tooltipRaw={item.tooltipRaw} icon={item.icon} itemType="stone" side="left">
-      <div className="flex cursor-default items-center gap-2">
-        <ItemIcon icon={item.icon} name={item.name} tier={0} grade={item.grade} itemType="stone" />
+      <div className="flex cursor-default items-start gap-2">
+        <ItemIcon icon={item.icon} name={item.name} tier={item.tier} grade={item.grade} itemType="stone" />
 
         <div className="w-[100px] shrink-0">
           <p className={`truncate text-[11px] font-medium leading-tight ${gradeNameColor(item.grade)}`}>
@@ -328,8 +321,8 @@ function StoneRow({ item }: { item: NamedItem & { option: string[]; engravings: 
           </div>
         </div>
 
-        <div className="flex min-w-0 flex-1 flex-wrap gap-1">
-          {(item.engravings ?? []).map((eng, i) => <StoneEngravingBadge key={i} eng={eng} />)}
+        <div className="min-w-0 flex-1">
+          {(item.engravings ?? []).map((eng, i) => <StoneEngravingLine key={i} eng={eng} />)}
         </div>
       </div>
     </EquipmentTooltip>

@@ -253,10 +253,12 @@ function parseEquipment(equipment: any[]) {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function namedInfo(item: any) {
+    const { tier } = itemLevelAndTier(item)
     return {
       name: (item?.Name ?? '') as string,
       icon: (item?.Icon ?? '') as string,
       grade: (item?.Grade ?? '') as string,
+      tier,
       tooltipRaw: (item?.Tooltip ?? '') as string,
     }
   }

@@ -80,25 +80,42 @@ function parseItemPartBox(val: any): TooltipSection | null {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseIndentGroup(val: any): TooltipSection | null {
   if (!val) return null
+  const header = stripHtml(val.Element_000?.topStr ?? '') || '각인 효과'
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const contentStr: Record<string, any> = val.Element_000?.contentStr ?? {}
   const lines: TooltipLine[] = []
 
   for (const key of Object.keys(contentStr).sort()) {
     const entry = contentStr[key]
-    if (!entry?.contentStr) continue
-    for (const innerKey of Object.keys(entry.contentStr).sort()) {
-      const inner = entry.contentStr[innerKey]
-      const raw: string = inner?.contentStr ?? ''
+    if (!entry) continue
+
+    // 스톤 형식: contentStr이 바로 HTML 문자열
+    if (typeof entry.contentStr === 'string') {
+      const raw = entry.contentStr
       const text = stripHtml(raw)
       if (!text) continue
-      // bPoint 0=활성, 1=비활성
-      const color = inner?.bPoint === 0 ? 'white' : 'gray'
+      // 감소 각인 (빨간색)
+      const color = raw.includes('FE2E2E') ? 'red'
+        : raw.includes('73DC04') ? 'teal'   // 레벨 보너스 (녹색)
+        : 'white'
       lines.push({ text, color })
+      continue
+    }
+
+    // 기존 형식: contentStr이 객체 (하위 엔트리들)
+    if (typeof entry.contentStr === 'object') {
+      for (const innerKey of Object.keys(entry.contentStr).sort()) {
+        const inner = entry.contentStr[innerKey]
+        const raw: string = inner?.contentStr ?? ''
+        const text = stripHtml(raw)
+        if (!text) continue
+        const color = inner?.bPoint === 0 ? 'white' : 'gray'
+        lines.push({ text, color })
+      }
     }
   }
 
-  return lines.length ? { header: '각인 효과', lines } : null
+  return lines.length ? { header, lines } : null
 }
 
 // ===================================================================

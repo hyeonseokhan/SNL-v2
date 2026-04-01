@@ -66,6 +66,7 @@ export interface NamedItem {
   name: string
   icon: string
   grade: string
+  tier: number
   tooltipRaw: string
 }
 
