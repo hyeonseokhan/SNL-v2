@@ -7,6 +7,7 @@
  * 장비 아이콘 호버 시 상세 정보를 표시합니다.
  */
 
+import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import { parseTooltipJson } from "@/lib/tooltip-parser";
 import type { ParsedTooltip, TooltipLine } from "@/lib/tooltip-parser";
@@ -145,7 +146,7 @@ function TooltipContent({ parsed, icon, itemType = "" }: TooltipContentProps) {
   return (
     <div className="w-[260px] overflow-hidden rounded-lg border border-black/[0.08] bg-white shadow-2xl dark:border-white/10 dark:bg-[#181b23]">
       {/* 헤더: 아이콘 + 이름 */}
-      <div className="flex items-start gap-2.5 p-3">
+      <div className="flex items-start gap-2.5 px-3 py-2.5">
         {icon && (
           <div
             className="relative h-11 w-11 shrink-0 overflow-hidden rounded-sm"
@@ -180,12 +181,12 @@ function TooltipContent({ parsed, icon, itemType = "" }: TooltipContentProps) {
             {name}
           </p>
           <p
-            className={`mt-0.5 text-[11px] ${gradeNameColor(gradeType)} opacity-70`}
+            className={`text-[11px] leading-tight ${gradeNameColor(gradeType)} opacity-70`}
           >
             {gradeType}
           </p>
           {(itemLevel > 0 || tier > 0) && (
-            <p className="mt-0.5 text-[10px] text-black/50 dark:text-white/50">
+            <p className="text-[10px] leading-tight text-black/50 dark:text-white/50">
               {itemLevel > 0 && `아이템 레벨 ${itemLevel.toLocaleString()}`}
               {tier > 0 && ` (티어 ${tier})`}
             </p>
@@ -251,21 +252,40 @@ export function EquipmentTooltip({
   side = "right",
 }: EquipmentTooltipProps) {
   const parsed = parseTooltipJson(tooltipRaw);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+
+  const handleEnter = useCallback(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+    // children 내부의 아이템 이름(p.truncate) 좌표를 기준으로 툴팁 위치 결정
+    const nameEl = wrapper.querySelector("p.truncate") as HTMLElement | null;
+    const anchor = nameEl ?? wrapper;
+    const rect = anchor.getBoundingClientRect();
+    setPos({ x: rect.left, y: rect.top });
+  }, []);
+
+  const handleLeave = useCallback(() => setPos(null), []);
+
   if (!parsed) return <>{children}</>;
 
   return (
-    <div className="group/tip relative">
+    <div
+      ref={wrapperRef}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+    >
       {children}
 
-      {/* 툴팁 */}
-      <div
-        className={[
-          "pointer-events-none absolute top-0 z-50 opacity-0 transition-opacity duration-150 group-hover/tip:opacity-100",
-          side === "right" ? "left-full ml-2" : "right-full mr-2",
-        ].join(" ")}
-      >
-        <TooltipContent parsed={parsed} icon={icon} itemType={itemType} />
-      </div>
+      {/* 툴팁 — fixed 포지셔닝으로 아이템 이름 좌표에서 시작 */}
+      {pos && (
+        <div
+          className="pointer-events-none fixed z-50 animate-in fade-in duration-150"
+          style={{ top: pos.y, left: pos.x }}
+        >
+          <TooltipContent parsed={parsed} icon={icon} itemType={itemType} />
+        </div>
+      )}
     </div>
   );
 }
