@@ -89,7 +89,7 @@ export interface ArmoryData {
     ring1: AccessoryInfo
     ring2: AccessoryInfo
     bangle: AccessoryInfo & { option: string[] }
-    stone: NamedItem & { option: string[]; engravings: StoneEngraving[] }
+    stone: NamedItem & { option: string[]; engravings: StoneEngraving[]; levelBonus: string }
     compass: NamedItem
     charm: NamedItem
     orb: NamedItem

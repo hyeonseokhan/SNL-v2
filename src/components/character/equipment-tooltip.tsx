@@ -59,6 +59,7 @@ const LINE_COLOR: Record<string, string> = {
   legendary: "text-[#9A7A00] dark:text-[#FFD200]",
   red: "text-[#C24B46]",
   teal: "text-[#2BA8BF] dark:text-[#5FD3F1]",
+  green: "text-[#4CAF50] dark:text-[#73DC04]",
   white: "text-black/80 dark:text-white/80",
   gray: "text-black/45 dark:text-white/40",
 };

@@ -176,12 +176,13 @@ function parseEquipment(equipment: any[]) {
     return [r1, r2].filter(Boolean)
   }
 
-  /** 스톤 각인 효과 추출 */
+  /** 스톤 각인 효과 + 레벨 보너스 추출 */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function stoneEngravings(item: any): { name: string; level: number; isNegative: boolean }[] {
-    if (!item) return []
+  function stoneEngravingsAndBonus(item: any): { engravings: { name: string; level: number; isNegative: boolean }[]; levelBonus: string } {
+    if (!item) return { engravings: [], levelBonus: '' }
     const t = parseTooltip(item.Tooltip)
-    const results: { name: string; level: number; isNegative: boolean }[] = []
+    const engravings: { name: string; level: number; isNegative: boolean }[] = []
+    let levelBonus = ''
     for (let i = 0; i <= 15; i++) {
       const key = `Element_${String(i).padStart(3, '0')}`
       const el = t[key]
@@ -189,14 +190,19 @@ function parseEquipment(equipment: any[]) {
       const contentStr = el.value?.Element_000?.contentStr ?? {}
       for (const k of Object.keys(contentStr).sort()) {
         const raw: string = contentStr[k]?.contentStr ?? ''
+        // 레벨 보너스 (녹색 #73DC04)
+        if (raw.includes('73DC04')) {
+          levelBonus = stripHtml(raw).replace(/\[레벨 보너스\]\s*/, '')
+          continue
+        }
         const nameMatch = raw.match(/\[(?:<[^>]+>)*([^<\]]+)(?:<[^>]+>)*\]/)
         const lvMatch = raw.match(/Lv\.(\d+)/)
         if (!nameMatch || !lvMatch) continue
         const isNegative = raw.includes("FE2E2E")
-        results.push({ name: nameMatch[1], level: parseInt(lvMatch[1]), isNegative })
+        engravings.push({ name: nameMatch[1], level: parseInt(lvMatch[1]), isNegative })
       }
     }
-    return results
+    return { engravings, levelBonus }
   }
 
   // ── equipList (방어구 6종) ──────────────────────────────
@@ -282,7 +288,7 @@ function parseEquipment(equipment: any[]) {
         ring1: accInfo(rings[0]),
         ring2: accInfo(rings[1]),
         bangle: { ...accInfo(bangleItem), option: bangOptions(bangleItem) },
-        stone: { ...namedInfo(stoneItem), option: stoneOptions(stoneItem), engravings: stoneEngravings(stoneItem) },
+        stone: { ...namedInfo(stoneItem), option: stoneOptions(stoneItem), ...stoneEngravingsAndBonus(stoneItem) },
         compass: namedInfo(compItem),
         charm: namedInfo(charmItem),
         orb: namedInfo(orbItem),

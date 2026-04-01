@@ -305,7 +305,7 @@ function StoneEngravingLine({ eng }: { eng: StoneEngraving }) {
   )
 }
 
-function StoneRow({ item }: { item: NamedItem & { option: string[]; engravings: StoneEngraving[] } }) {
+function StoneRow({ item }: { item: NamedItem & { option: string[]; engravings: StoneEngraving[]; levelBonus: string } }) {
   if (!item.name) return null
   return (
     <EquipmentTooltip tooltipRaw={item.tooltipRaw} icon={item.icon} itemType="stone" side="left">
@@ -319,6 +319,11 @@ function StoneRow({ item }: { item: NamedItem & { option: string[]; engravings: 
           <div className="mt-0.5">
             <span className="text-[10px] text-black/50 dark:text-white/50">Lv.5</span>
           </div>
+          {item.levelBonus && (
+            <p className="mt-0.5 text-[10px] leading-[1.45] text-[#4CAF50] dark:text-[#73DC04]">
+              {item.levelBonus}
+            </p>
+          )}
         </div>
 
         <div className="min-w-0 flex-1">

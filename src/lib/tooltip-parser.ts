@@ -49,6 +49,7 @@ function mapColor(hex: string): string {
     case 'FFD200': return 'legendary'  // 전설 등급 색상
     case 'C24B46': return 'red'        // 경고/불가
     case '5FD3F1': return 'teal'       // 드롭 위치
+    case '73DC04': return 'green'     // 레벨 보너스
     default:        return 'white'
   }
 }
@@ -96,7 +97,7 @@ function parseIndentGroup(val: any): TooltipSection | null {
       if (!text) continue
       // 감소 각인 (빨간색)
       const color = raw.includes('FE2E2E') ? 'red'
-        : raw.includes('73DC04') ? 'teal'   // 레벨 보너스 (녹색)
+        : raw.includes('73DC04') ? 'green'  // 레벨 보너스 (녹색)
         : 'white'
       lines.push({ text, color })
       continue
