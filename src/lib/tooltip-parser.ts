@@ -95,9 +95,9 @@ function parseIndentGroup(val: any): TooltipSection | null {
       const raw = entry.contentStr
       const text = stripHtml(raw)
       if (!text) continue
-      // 감소 각인 (빨간색)
-      const color = raw.includes('FE2E2E') ? 'red'
-        : raw.includes('73DC04') ? 'green'  // 레벨 보너스 (녹색)
+      const color = raw.includes('FE2E2E') ? 'red'          // 감소 각인
+        : raw.includes('73DC04') ? 'green'                  // 레벨 보너스
+        : raw.includes('FFFFAC') ? 'buff'                   // 버프 각인
         : 'white'
       lines.push({ text, color })
       continue

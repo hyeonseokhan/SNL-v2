@@ -60,6 +60,7 @@ const LINE_COLOR: Record<string, string> = {
   red: "text-[#C24B46]",
   teal: "text-[#2BA8BF] dark:text-[#5FD3F1]",
   green: "text-[#4CAF50] dark:text-[#73DC04]",
+  buff: "text-[#B8960A] dark:text-[#FFFFAC]",
   white: "text-black/80 dark:text-white/80",
   gray: "text-black/45 dark:text-white/40",
 };
@@ -114,6 +115,19 @@ function QualityBar({ quality }: { quality: number }) {
 function LineText({ line }: { line: TooltipLine }) {
   const colorClass = LINE_COLOR[line.color] ?? "text-tx-body";
   const isColored = line.color !== "white" && line.color !== "gray";
+
+  // 각인 라인 ("[돌격대장] Lv.2"): 각인명에 색상, 나머지 기본색
+  if ((line.color === "buff" || line.color === "red") && line.text.match(/^\[.+\]\s*Lv\.\d+$/)) {
+    const match = line.text.match(/^(\[.+\])\s*(Lv\.\d+)$/);
+    if (match) {
+      return (
+        <span className="text-[11px] leading-none">
+          <span className={colorClass}>{match[1]}</span>
+          <span className="text-black/80 dark:text-white/80"> {match[2]}</span>
+        </span>
+      );
+    }
+  }
 
   // 색상이 적용된 라인: 텍스트는 기본색, 수치만 색상 적용
   if (isColored) {

@@ -307,21 +307,24 @@ function StoneEngravingLine({ eng }: { eng: StoneEngraving }) {
 
 function StoneRow({ item }: { item: NamedItem & { option: string[]; engravings: StoneEngraving[]; levelBonus: string } }) {
   if (!item.name) return null
+  const bonusParts = item.levelBonus ? item.levelBonus.split(/(\+[\d,.]+%?)/) : []
   return (
     <EquipmentTooltip tooltipRaw={item.tooltipRaw} icon={item.icon} itemType="stone" side="left">
       <div className="flex cursor-default items-start gap-2">
         <ItemIcon icon={item.icon} name={item.name} tier={item.tier} grade={item.grade} itemType="stone" />
 
-        <div className="w-[100px] shrink-0">
-          <p className={`truncate text-[11px] font-medium leading-tight ${gradeNameColor(item.grade)}`}>
+        <div className="w-[100px] shrink-0 space-y-0">
+          <p className={`truncate text-[11px] font-medium leading-none ${gradeNameColor(item.grade)}`}>
             {item.name}
           </p>
-          <div className="mt-0.5">
-            <span className="text-[10px] text-black/50 dark:text-white/50">Lv.5</span>
-          </div>
+          <p className="text-[10px] leading-none text-black/50 dark:text-white/50">Lv.5</p>
           {item.levelBonus && (
-            <p className="mt-0.5 text-[10px] leading-[1.45] text-[#4CAF50] dark:text-[#73DC04]">
-              {item.levelBonus}
+            <p className="text-[10px] leading-none">
+              {bonusParts.map((part, i) =>
+                /^\+[\d,.]+%?$/.test(part)
+                  ? <span key={i} className="text-[#4CAF50] dark:text-[#73DC04]">{part}</span>
+                  : <span key={i} className="text-black/80 dark:text-white/80">{part}</span>
+              )}
             </p>
           )}
         </div>
