@@ -247,17 +247,21 @@ function AccessoryRow({ item, itemType, showEnlightenment = true, tooltipSide = 
 // 보주 행
 // ===================================================================
 
-function OrbRow({ item }: { item: NamedItem }) {
+function OrbRow({ item }: { item: NamedItem & { paradisePower: number } }) {
   if (!item.name) return null
   return (
     <EquipmentTooltip tooltipRaw={item.tooltipRaw} icon={item.icon} itemType="orb" side="right">
       <div className="flex cursor-default items-center gap-2">
         <ItemIcon icon={item.icon} name={item.name} tier={0} grade={item.grade} itemType="orb" />
         <div className="min-w-0">
-          <p className="text-[10px] text-tx-muted">보주</p>
           <p className={`truncate text-[11px] font-medium leading-tight ${gradeNameColor(item.grade)}`}>
             {item.name}
           </p>
+          {item.paradisePower > 0 && (
+            <p className="text-[10px] leading-tight text-black/50 dark:text-white/50">
+              최대 낙원력: {item.paradisePower.toLocaleString()}
+            </p>
+          )}
         </div>
       </div>
     </EquipmentTooltip>

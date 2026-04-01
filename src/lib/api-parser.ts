@@ -205,6 +205,22 @@ function parseEquipment(equipment: any[]) {
     return { engravings, levelBonus }
   }
 
+  /** 보주 낙원력 추출 */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function orbParadisePower(item: any): number {
+    if (!item) return 0
+    const t = parseTooltip(item.Tooltip)
+    for (let i = 0; i <= 10; i++) {
+      const key = `Element_${String(i).padStart(3, '0')}`
+      const el = t[key]
+      if (!el || el.type !== 'ItemPartBox') continue
+      const content: string = el.value?.Element_001 ?? ''
+      const match = content.match(/최대 낙원력\s*:\s*([\d,]+)/)
+      if (match) return parseInt(match[1].replace(/,/g, ''))
+    }
+    return 0
+  }
+
   // ── equipList (방어구 6종) ──────────────────────────────
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const equipList = equipment
@@ -291,7 +307,7 @@ function parseEquipment(equipment: any[]) {
         stone: { ...namedInfo(stoneItem), option: stoneOptions(stoneItem), ...stoneEngravingsAndBonus(stoneItem) },
         compass: namedInfo(compItem),
         charm: namedInfo(charmItem),
-        orb: namedInfo(orbItem),
+        orb: { ...namedInfo(orbItem), paradisePower: orbParadisePower(orbItem) },
       },
     },
   }

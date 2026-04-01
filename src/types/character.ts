@@ -92,7 +92,7 @@ export interface ArmoryData {
     stone: NamedItem & { option: string[]; engravings: StoneEngraving[]; levelBonus: string }
     compass: NamedItem
     charm: NamedItem
-    orb: NamedItem
+    orb: NamedItem & { paradisePower: number }
   }
 }
 
