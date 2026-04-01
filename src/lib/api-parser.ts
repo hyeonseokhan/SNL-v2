@@ -176,6 +176,29 @@ function parseEquipment(equipment: any[]) {
     return [r1, r2].filter(Boolean)
   }
 
+  /** 스톤 각인 효과 추출 */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function stoneEngravings(item: any): { name: string; level: number; isNegative: boolean }[] {
+    if (!item) return []
+    const t = parseTooltip(item.Tooltip)
+    const results: { name: string; level: number; isNegative: boolean }[] = []
+    for (let i = 0; i <= 15; i++) {
+      const key = `Element_${String(i).padStart(3, '0')}`
+      const el = t[key]
+      if (!el || el.type !== 'IndentStringGroup') continue
+      const contentStr = el.value?.Element_000?.contentStr ?? {}
+      for (const k of Object.keys(contentStr).sort()) {
+        const raw: string = contentStr[k]?.contentStr ?? ''
+        const nameMatch = raw.match(/\[(?:<[^>]+>)*([^<\]]+)(?:<[^>]+>)*\]/)
+        const lvMatch = raw.match(/Lv\.(\d+)/)
+        if (!nameMatch || !lvMatch) continue
+        const isNegative = raw.includes("FE2E2E")
+        results.push({ name: nameMatch[1], level: parseInt(lvMatch[1]), isNegative })
+      }
+    }
+    return results
+  }
+
   // ── equipList (방어구 6종) ──────────────────────────────
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const equipList = equipment
@@ -257,7 +280,7 @@ function parseEquipment(equipment: any[]) {
         ring1: accInfo(rings[0]),
         ring2: accInfo(rings[1]),
         bangle: { ...accInfo(bangleItem), option: bangOptions(bangleItem) },
-        stone: { ...namedInfo(stoneItem), option: stoneOptions(stoneItem) },
+        stone: { ...namedInfo(stoneItem), option: stoneOptions(stoneItem), engravings: stoneEngravings(stoneItem) },
         compass: namedInfo(compItem),
         charm: namedInfo(charmItem),
         orb: namedInfo(orbItem),

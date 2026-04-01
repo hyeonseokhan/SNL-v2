@@ -69,6 +69,12 @@ export interface NamedItem {
   tooltipRaw: string
 }
 
+export interface StoneEngraving {
+  name: string
+  level: number
+  isNegative: boolean
+}
+
 export interface ArmoryData {
   /** 방어구 6종 (머리/어깨/상의/하의/장갑/무기) */
   equipList: EquipItem[]
@@ -82,7 +88,7 @@ export interface ArmoryData {
     ring1: AccessoryInfo
     ring2: AccessoryInfo
     bangle: AccessoryInfo & { option: string[] }
-    stone: NamedItem & { option: string[] }
+    stone: NamedItem & { option: string[]; engravings: StoneEngraving[] }
     compass: NamedItem
     charm: NamedItem
     orb: NamedItem
