@@ -14,9 +14,15 @@ export interface TooltipSection {
   lines: TooltipLine[]  // 각 효과 라인
 }
 
+export interface TooltipSegment {
+  text: string
+  color: string
+}
+
 export interface TooltipLine {
   text: string
   color: string  // 'orange' | 'purple' | 'blue' | 'white' | 'gray'
+  segments?: TooltipSegment[]  // 한 라인 내 여러 색상이 있을 때 사용
 }
 
 export interface ParsedTooltip {
@@ -50,15 +56,52 @@ function mapColor(hex: string): string {
     case 'C24B46': return 'red'        // 경고/불가
     case '5FD3F1': return 'teal'       // 드롭 위치
     case '73DC04': return 'green'     // 레벨 보너스
+    case 'FFFF99': return 'yellow'    // 수치 강조 (거리 등)
+    case 'FF7F00': return 'orange'    // 수치 강조 (피해량 등)
+    case 'E2C87A': return 'ancient'   // 아이템 설명
     default:        return 'white'
   }
 }
 
-/** HTML 라인에서 색상과 텍스트 추출 */
+/** HTML 라인에서 색상과 텍스트 추출 (인라인 멀티 색상 지원) */
 function parseLineColor(html: string): TooltipLine {
+  const text = stripHtml(html)
   const colorMatch = html.match(/FONT\s+[^>]*COLOR=['"]?#?([0-9A-Fa-f]{6})/i)
   const color = colorMatch ? mapColor(colorMatch[1]) : 'white'
-  return { text: stripHtml(html), color }
+
+  // 여러 FONT COLOR가 있는지 확인
+  const colorMatches = html.match(/FONT\s+[^>]*COLOR=['"]?#?([0-9A-Fa-f]{6})/gi)
+  if (!colorMatches || colorMatches.length <= 1) {
+    return { text, color }
+  }
+
+  // 멀티 색상: FONT 태그 기준으로 세그먼트 분리
+  const segments: TooltipSegment[] = []
+  // <FONT COLOR='#HEX'>텍스트</FONT> 또는 태그 밖 텍스트를 분리
+  const re = /<FONT\s+[^>]*COLOR=['"]?#?([0-9A-Fa-f]{6})['"]?[^>]*>([\s\S]*?)<\/FONT>/gi
+  let lastIdx = 0
+  let match: RegExpExecArray | null
+
+  while ((match = re.exec(html)) !== null) {
+    // 태그 앞의 일반 텍스트
+    if (match.index > lastIdx) {
+      const before = stripHtml(html.slice(lastIdx, match.index))
+      if (before) segments.push({ text: before, color: 'white' })
+    }
+    const segColor = mapColor(match[1])
+    const segText = stripHtml(match[2])
+    if (segText) segments.push({ text: segText, color: segColor })
+    lastIdx = match.index + match[0].length
+  }
+  // 나머지 텍스트
+  if (lastIdx < html.length) {
+    const after = stripHtml(html.slice(lastIdx))
+    if (after) segments.push({ text: after, color: 'white' })
+  }
+
+  return segments.length > 1
+    ? { text, color, segments }
+    : { text, color }
 }
 
 /** ItemPartBox value → TooltipSection */
@@ -69,10 +112,12 @@ function parseItemPartBox(val: any): TooltipSection | null {
   const rawContent: string = val.Element_001 ?? ''
   if (!rawContent) return null
 
+  const TOOLTIP_SKIP = ['낙원력']
   const lines: TooltipLine[] = rawContent
     .split(/<br\s*\/?>/i)
     .map((line) => parseLineColor(line))
     .filter((l) => l.text.length > 0)
+    .filter((l) => !TOOLTIP_SKIP.some((kw) => l.text.includes(kw)))
 
   return { header, lines }
 }

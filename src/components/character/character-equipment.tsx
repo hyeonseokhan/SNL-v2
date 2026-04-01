@@ -258,7 +258,7 @@ function OrbRow({ item }: { item: NamedItem & { paradisePower: number } }) {
             {item.name}
           </p>
           {item.paradisePower > 0 && (
-            <p className="text-[10px] leading-tight text-black/50 dark:text-white/50">
+            <p className="text-[10px] leading-tight text-black/80 dark:text-white/80">
               최대 낙원력: {item.paradisePower.toLocaleString()}
             </p>
           )}

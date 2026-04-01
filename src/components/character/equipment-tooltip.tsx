@@ -10,7 +10,7 @@
 import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import { parseTooltipJson } from "@/lib/tooltip-parser";
-import type { ParsedTooltip, TooltipLine } from "@/lib/tooltip-parser";
+import type { ParsedTooltip, TooltipLine, TooltipSegment } from "@/lib/tooltip-parser";
 
 // ===================================================================
 // 아이콘 헬퍼 (character-equipment와 동일한 3레이어 구조)
@@ -61,6 +61,7 @@ const LINE_COLOR: Record<string, string> = {
   teal: "text-[#2BA8BF] dark:text-[#5FD3F1]",
   green: "text-[#4CAF50] dark:text-[#73DC04]",
   buff: "text-[#B8960A] dark:text-[#FFFFAC]",
+  yellow: "text-[#B8A800] dark:text-[#FFFF99]",
   white: "text-black/80 dark:text-white/80",
   gray: "text-black/45 dark:text-white/40",
 };
@@ -112,9 +113,25 @@ function QualityBar({ quality }: { quality: number }) {
   );
 }
 
+function SegmentText({ segment }: { segment: TooltipSegment }) {
+  const cls = LINE_COLOR[segment.color] ?? "text-black/80 dark:text-white/80";
+  return <span className={cls}>{segment.text}</span>;
+}
+
 function LineText({ line }: { line: TooltipLine }) {
   const colorClass = LINE_COLOR[line.color] ?? "text-tx-body";
   const isColored = line.color !== "white" && line.color !== "gray";
+
+  // 멀티 색상 세그먼트가 있으면 인라인 렌더링
+  if (line.segments && line.segments.length > 0) {
+    return (
+      <span className="text-[11px] leading-none">
+        {line.segments.map((seg, i) => (
+          <SegmentText key={i} segment={seg} />
+        ))}
+      </span>
+    );
+  }
 
   // 각인 라인 ("[돌격대장] Lv.2"): 각인명만 색상, 대괄호·Lv는 기본색
   if ((line.color === "buff" || line.color === "red") && line.text.match(/^\[.+\]\s*Lv\.\d+$/)) {
