@@ -317,7 +317,6 @@ function StoneRow({ item }: { item: NamedItem & { option: string[]; engravings: 
           <p className={`truncate text-[11px] font-medium leading-tight ${gradeNameColor(item.grade)}`}>
             {item.name}
           </p>
-          <p className="text-[10px] leading-tight text-black/50 dark:text-white/50">Lv.5</p>
           {item.levelBonus && (
             <p className="text-[10px] leading-tight">
               {bonusParts.map((part, i) =>
