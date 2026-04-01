@@ -191,7 +191,7 @@ function ArmorRow({ item }: { item: EquipItem }) {
           <div className="mt-0.5 flex items-center gap-1.5">
             <QualityBadge quality={item.quality} />
             {item.itemLevel > 0 && (
-              <span className="text-[10px] text-tx-muted">
+              <span className="text-[10px] text-black/80 dark:text-white/80">
                 <span className="text-[8px]">·</span> iLv {item.itemLevel}
               </span>
             )}
