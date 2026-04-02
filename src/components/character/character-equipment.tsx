@@ -272,6 +272,44 @@ function OrbRow({ item }: { item: NamedItem & { paradisePower: number } }) {
 // 팔찌 행
 // ===================================================================
 
+/** 팔찌 수치 색상 매핑 (FONT COLOR hex → Tailwind 클래스) */
+const BANGLE_VALUE_COLOR: Record<string, string> = {
+  '91FE02': 'text-[#4CAF50] dark:text-[#91FE02]',     // 고정 스탯 녹색
+  'CE43FC': 'text-[#9B2FD4] dark:text-[#CE43FC]',     // 보라색
+  'FE9600': 'text-[#C47200] dark:text-[#FE9600]',     // 주황색
+  '99FF99': 'text-[#2E8B57] dark:text-[#99FF99]',     // 연녹색
+}
+
+/**
+ * 팔찌 tooltipRaw에서 각 옵션 라인의 수치 색상을 추출
+ *
+ * 원본 HTML의 FONT COLOR를 파싱하여 텍스트 → 색상 매핑을 생성합니다.
+ *
+ * @param tooltipRaw - 팔찌 툴팁 원본 JSON 문자열
+ * @returns 수치 문자열 → Tailwind 색상 클래스 매핑
+ *
+ * @example
+ * // "+83" → "text-[#4CAF50] dark:text-[#91FE02]"
+ * // "3.5%" → "text-[#C47200] dark:text-[#FE9600]"
+ */
+function parseBangleColors(tooltipRaw: string): Record<string, string> {
+  const colorMap: Record<string, string> = {}
+  try {
+    const tip = JSON.parse(tooltipRaw)
+    const content: string = tip.Element_005?.value?.Element_001 ?? ''
+    const re = /<FONT\s+COLOR='#([0-9A-Fa-f]{6})'>([^<]+)<\/FONT>/gi
+    let match: RegExpExecArray | null
+    while ((match = re.exec(content)) !== null) {
+      const hex = match[1].toUpperCase()
+      const value = match[2].trim()
+      if (BANGLE_VALUE_COLOR[hex]) {
+        colorMap[value] = BANGLE_VALUE_COLOR[hex]
+      }
+    }
+  } catch { /* 파싱 실패 시 빈 맵 */ }
+  return colorMap
+}
+
 /**
  * 팔찌 옵션 문자열을 개별 효과로 분리
  *
@@ -280,10 +318,6 @@ function OrbRow({ item }: { item: NamedItem & { paradisePower: number } }) {
  *
  * @param options - API에서 파싱된 옵션 배열
  * @returns 개별 효과 문자열 배열
- *
- * @example
- * splitBangleOptions(["신속 +83", "추가 피해가 3.5% 증가한다.치명타 적중률이 4.2% 증가한다."])
- * // → ["신속 +83", "추가 피해가 3.5% 증가한다.", "치명타 적중률이 4.2% 증가한다."]
  */
 function splitBangleOptions(options: string[]): string[] {
   const result: string[] = []
@@ -301,19 +335,23 @@ function splitBangleOptions(options: string[]): string[] {
 /**
  * 팔찌 옵션 한 줄 표시
  *
- * 스탯 옵션(신속 +83)은 이름 + 수치, 퍼센트 옵션은 설명 텍스트로 표시합니다.
- * 수치 부분만 색상을 적용합니다.
+ * 텍스트 내 수치를 원본 HTML 색상에 맞춰 표시합니다.
+ * colorMap에 매칭되는 수치가 있으면 해당 색상, 없으면 기본 파란색을 적용합니다.
  *
  * @param text - 옵션 텍스트
+ * @param colorMap - 수치 → Tailwind 색상 클래스 매핑
  */
-function BangleOptionLine({ text }: { text: string }) {
+function BangleOptionLine({ text, colorMap }: { text: string; colorMap: Record<string, string> }) {
+  const defaultValueColor = 'text-[#007AB8] dark:text-[#00B5FF]'
+
   // 스탯 옵션: "신속 +83", "치명 +117"
   const statMatch = text.match(/^(.+?)\s*(\+[\d,.]+)$/)
   if (statMatch) {
+    const valueColor = colorMap[statMatch[2]] ?? defaultValueColor
     return (
       <p className="whitespace-nowrap text-[10px] leading-[1.45]">
         <span className="text-black/80 dark:text-white/80">{statMatch[1]} </span>
-        <span className="text-[#007AB8] dark:text-[#00B5FF]">{statMatch[2]}</span>
+        <span className={valueColor}>{statMatch[2]}</span>
       </p>
     )
   }
@@ -324,7 +362,7 @@ function BangleOptionLine({ text }: { text: string }) {
     <p className="whitespace-nowrap text-[10px] leading-[1.45]">
       {parts.map((part, i) =>
         /[\d,.]+%/.test(part)
-          ? <span key={i} className="text-[#007AB8] dark:text-[#00B5FF]">{part}</span>
+          ? <span key={i} className={colorMap[part] ?? defaultValueColor}>{part}</span>
           : <span key={i} className="text-black/80 dark:text-white/80">{part}</span>
       )}
     </p>
@@ -334,11 +372,14 @@ function BangleOptionLine({ text }: { text: string }) {
 /**
  * 팔찌 행 컴포넌트
  *
+ * tooltipRaw에서 원본 색상을 추출하여 수치별로 적용합니다.
+ *
  * @param item - 팔찌 악세서리 데이터
  */
 function BangleRow({ item }: { item: AccessoryInfo }) {
   if (!item.name) return null
   const options = splitBangleOptions(item.option)
+  const colorMap = parseBangleColors(item.tooltipRaw)
   return (
     <EquipmentTooltip tooltipRaw={item.tooltipRaw} icon={item.icon} itemType="팔찌" side="left">
       <div className="flex cursor-default items-start gap-2">
@@ -348,7 +389,7 @@ function BangleRow({ item }: { item: AccessoryInfo }) {
             {item.name}
           </p>
           <div className="mt-0.5">
-            {options.map((opt, i) => <BangleOptionLine key={i} text={opt} />)}
+            {options.map((opt, i) => <BangleOptionLine key={i} text={opt} colorMap={colorMap} />)}
           </div>
         </div>
       </div>
