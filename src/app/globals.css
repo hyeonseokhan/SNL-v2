@@ -160,6 +160,7 @@
   html {
     @apply font-sans;
     font-feature-settings: 'ss01';
+    zoom: 1.2;
   }
 }
 

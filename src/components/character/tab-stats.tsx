@@ -2,7 +2,7 @@
  * @file 능력치 탭 — KLOA 컴포넌트 단위 복제
  */
 
-import type { CharData, ArkPassiveSection } from '@/types/character'
+import type { CharData, ArkPassiveSection, GemData } from '@/types/character'
 
 interface TabStatsProps {
   data: CharData
@@ -115,28 +115,87 @@ function EquipmentSection({ data }: { data: CharData }) {
 // 보석 섹션 (KLOA: 가로 한 줄, 아이콘 44px, 라운드 6px, 하단 겁화N 작열N)
 // ===================================================================
 
+/**
+ * 보석 등급별 배경 그라디언트
+ *
+ * @param grade - 보석 등급 (유물, 전설 등)
+ * @returns CSS background 스타일 문자열
+ */
+function gemBackground(grade: string): string {
+  switch (grade) {
+    case '유물': return 'linear-gradient(135deg, rgb(52,26,9), rgb(162,64,6))'
+    case '전설': return 'linear-gradient(135deg, rgb(40,32,0), rgb(168,138,0))'
+    case '영웅': return 'linear-gradient(135deg, rgb(26,8,36), rgb(118,44,188))'
+    default:     return 'linear-gradient(135deg, rgb(18,20,26), rgb(45,48,58))'
+  }
+}
+
+/**
+ * 개별 보석 아이콘 + 레벨 배지
+ *
+ * 마우스 호버 시 보석 이름을 툴팁으로 표시합니다.
+ *
+ * @param gem - 보석 데이터
+ */
+function GemIcon({ gem }: { gem: GemData }) {
+  return (
+    <div className="group/gem relative">
+      <div
+        className="relative size-10 shrink-0 overflow-hidden rounded-md"
+        style={{ background: gemBackground(gem.grade) }}
+      >
+        <img src={gem.icon} alt={gem.name} className="size-full object-contain" />
+        <span className="absolute bottom-0 left-0 rounded-tr bg-black/70 px-1 py-[1px] text-[9px] font-bold leading-none text-white">
+          {gem.level}
+        </span>
+      </div>
+      {/* 호버 툴팁 */}
+      <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded bg-black/90 px-2 py-1 text-[10px] text-white opacity-0 transition-opacity group-hover/gem:opacity-100">
+        {gem.name}
+      </div>
+    </div>
+  )
+}
+
+/**
+ * 보석 섹션
+ *
+ * KLOA 스타일: 아이콘 일렬 나열 + 하단에 딜증/쿨감 분류 표시.
+ * 딜증(겁화) 보석을 먼저, 쿨감(작열) 보석을 나중에 정렬합니다.
+ *
+ * @param data - 캐릭터 전체 데이터
+ */
 function GemsSection({ data }: { data: CharData }) {
   const { gem } = data
   if (!gem.length) return null
 
-  const damageCount = gem.filter(g => g.type === 'damage').length
-  const cooldownCount = gem.filter(g => g.type === 'cooldown').length
+  const damageGems = gem.filter(g => g.type === 'damage')
+  const cooldownGems = gem.filter(g => g.type === 'cooldown')
+  const sorted = [...damageGems, ...cooldownGems]
 
   return (
-    <div className="rounded-lg bg-card px-[17px] pt-4 pb-2 shadow-[1px_1px_10px_0_rgba(72,75,108,0.08)]">
-      <div className="flex items-center justify-center gap-x-2">
-        {gem.map((g, i) => {
-          const bgClass = g.grade === '전설' ? 'bg-grade-legendary' : g.grade === '유물' ? 'bg-grade-relic' : 'bg-secondary'
-          return (
-            <div key={i} className={`relative flex size-11 items-center justify-center rounded-md ${bgClass}`}>
-              <span className="text-sm font-bold tabular-nums">{g.level}</span>
-            </div>
-          )
-        })}
+    <div className="rounded-lg border border-black/[0.06] bg-white px-4 py-3 dark:border-white/[0.06] dark:bg-[#181b23]">
+      {/* 보석 아이콘 나열 */}
+      <div className="flex items-center justify-center gap-1.5">
+        {sorted.map((g, i) => (
+          <GemIcon key={i} gem={g} />
+        ))}
       </div>
-      <div className="mt-2 flex items-center justify-center gap-x-6 pb-2 text-xs text-tx-caption">
-        <span>겁화 {damageCount}</span>
-        <span>작열 {cooldownCount}</span>
+
+      {/* 딜증 / 쿨감 분류 */}
+      <div className="mt-2 flex items-center justify-center">
+        <div className="flex items-center gap-6 text-[11px]">
+          {damageGems.length > 0 && (
+            <span className="text-black/50 dark:text-white/50">
+              딜증 <span className="font-medium text-black/80 dark:text-white/80">{damageGems.length}</span>
+            </span>
+          )}
+          {cooldownGems.length > 0 && (
+            <span className="text-black/50 dark:text-white/50">
+              쿨감 <span className="font-medium text-black/80 dark:text-white/80">{cooldownGems.length}</span>
+            </span>
+          )}
+        </div>
       </div>
     </div>
   )

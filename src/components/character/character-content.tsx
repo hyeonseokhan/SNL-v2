@@ -10,6 +10,7 @@
 import { useState } from 'react'
 import { CharacterMenu } from './character-menu'
 import { CharacterEquipment } from './character-equipment'
+import { GemsSection } from './gems-section'
 import type { CharData } from '@/types/character'
 
 // ===================================================================
@@ -41,7 +42,12 @@ export function CharacterContent({ data }: CharacterContentProps) {
     <div className="space-y-2">
       <CharacterMenu activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {activeTab === 'stats'      && <CharacterEquipment armory={data.armory} />}
+      {activeTab === 'stats'      && (
+        <>
+          <CharacterEquipment armory={data.armory} />
+          <GemsSection gems={data.gem} />
+        </>
+      )}
       {activeTab === 'avatar'     && <TabPlaceholder label="아바타" />}
       {activeTab === 'skills'     && <TabPlaceholder label="스킬" />}
       {activeTab === 'characters' && <TabPlaceholder label="보유 캐릭터" />}

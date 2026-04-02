@@ -371,26 +371,42 @@ function parseEngraving(armoryEngraving: any) {
   }
 }
 
+/**
+ * 보석 데이터 파싱
+ *
+ * ArmoryGem.Gems[]와 ArmoryGem.Effects.Skills[]를 매칭하여
+ * 각 보석의 적용 스킬명, 효과, 추가 옵션을 추출합니다.
+ *
+ * @param armoryGem - 공식 API의 ArmoryGem 응답
+ * @returns 파싱된 보석 배열
+ */
 function parseGems(armoryGem: any) {
   const gems: any[] = armoryGem?.Gems ?? []
-  const effects: any[] = Array.isArray(armoryGem?.Effects)
-    ? armoryGem.Effects
-    : Object.values(armoryGem?.Effects ?? {})
+  const skills: any[] = armoryGem?.Effects?.Skills ?? []
 
-  const effMap: Record<number, any> = {}
-  for (const e of effects) {
-    if (e.GemIdx !== undefined) effMap[e.GemIdx] = e
+  // GemSlot → Skills 매핑
+  const skillMap: Record<number, any> = {}
+  for (const s of skills) {
+    if (s.GemSlot !== undefined) skillMap[s.GemSlot] = s
   }
 
   return {
-    gem: gems.map((g, idx) => ({
-      level: g.Level ?? 0,
-      name: stripHtml(g.Name),
-      icon: (g.Icon ?? '') as string,
-      grade: g.Grade ?? '',
-      type: (g.Name ?? '').includes('작열') ? 'cooldown' : 'damage',
-      effect: effMap[idx]?.Description ?? '',
-    })),
+    gem: gems.map((g) => {
+      const slot = g.Slot ?? 0
+      const skill = skillMap[slot]
+      const desc = Array.isArray(skill?.Description) ? skill.Description.join(', ') : ''
+      return {
+        level: g.Level ?? 0,
+        name: stripHtml(g.Name),
+        icon: (g.Icon ?? '') as string,
+        grade: g.Grade ?? '',
+        type: (g.Name ?? '').includes('작열') ? 'cooldown' : 'damage',
+        effect: desc,
+        skillName: (skill?.Name ?? '') as string,
+        skillIcon: (skill?.Icon ?? '') as string,
+        option: (skill?.Option ?? '') as string,
+      }
+    }),
   }
 }
 
