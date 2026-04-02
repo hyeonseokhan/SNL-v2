@@ -272,22 +272,83 @@ function OrbRow({ item }: { item: NamedItem & { paradisePower: number } }) {
 // 팔찌 행
 // ===================================================================
 
+/**
+ * 팔찌 옵션 문자열을 개별 효과로 분리
+ *
+ * API는 복합 효과를 하나의 문자열로 연결하여 전달합니다.
+ * "증가한다." 뒤에서 분리하여 개별 효과로 나눕니다.
+ *
+ * @param options - API에서 파싱된 옵션 배열
+ * @returns 개별 효과 문자열 배열
+ *
+ * @example
+ * splitBangleOptions(["신속 +83", "추가 피해가 3.5% 증가한다.치명타 적중률이 4.2% 증가한다."])
+ * // → ["신속 +83", "추가 피해가 3.5% 증가한다.", "치명타 적중률이 4.2% 증가한다."]
+ */
+function splitBangleOptions(options: string[]): string[] {
+  const result: string[] = []
+  for (const opt of options) {
+    if (opt.includes('증가한다.') || opt.includes('감소한다.')) {
+      const parts = opt.split(/(?<=증가한다\.|감소한다\.)/).filter(Boolean)
+      result.push(...parts)
+    } else {
+      result.push(opt)
+    }
+  }
+  return result
+}
+
+/**
+ * 팔찌 옵션 한 줄 표시
+ *
+ * 스탯 옵션(신속 +83)은 이름 + 수치, 퍼센트 옵션은 설명 텍스트로 표시합니다.
+ * 수치 부분만 색상을 적용합니다.
+ *
+ * @param text - 옵션 텍스트
+ */
+function BangleOptionLine({ text }: { text: string }) {
+  // 스탯 옵션: "신속 +83", "치명 +117"
+  const statMatch = text.match(/^(.+?)\s*(\+[\d,.]+)$/)
+  if (statMatch) {
+    return (
+      <p className="whitespace-nowrap text-[10px] leading-[1.45]">
+        <span className="text-black/80 dark:text-white/80">{statMatch[1]} </span>
+        <span className="text-[#007AB8] dark:text-[#00B5FF]">{statMatch[2]}</span>
+      </p>
+    )
+  }
+
+  // 퍼센트 옵션: "추가 피해가 3.5% 증가한다." → 수치만 색상
+  const parts = text.split(/([\d,.]+%)/)
+  return (
+    <p className="whitespace-nowrap text-[10px] leading-[1.45]">
+      {parts.map((part, i) =>
+        /[\d,.]+%/.test(part)
+          ? <span key={i} className="text-[#007AB8] dark:text-[#00B5FF]">{part}</span>
+          : <span key={i} className="text-black/80 dark:text-white/80">{part}</span>
+      )}
+    </p>
+  )
+}
+
+/**
+ * 팔찌 행 컴포넌트
+ *
+ * @param item - 팔찌 악세서리 데이터
+ */
 function BangleRow({ item }: { item: AccessoryInfo }) {
   if (!item.name) return null
+  const options = splitBangleOptions(item.option)
   return (
     <EquipmentTooltip tooltipRaw={item.tooltipRaw} icon={item.icon} itemType="팔찌" side="left">
       <div className="flex cursor-default items-start gap-2">
         <ItemIcon icon={item.icon} name={item.name} tier={item.tier} grade={item.grade} itemType="팔찌" />
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className={`truncate text-[11px] font-medium leading-tight ${gradeNameColor(item.grade)}`}>
             {item.name}
           </p>
-          <div className="mt-1 flex flex-wrap gap-1">
-            {item.option.map((opt, i) => (
-              <span key={i} className="rounded bg-white/10 px-1.5 py-[2px] text-[10px] text-tx-label">
-                {opt}
-              </span>
-            ))}
+          <div className="mt-0.5">
+            {options.map((opt, i) => <BangleOptionLine key={i} text={opt} />)}
           </div>
         </div>
       </div>
