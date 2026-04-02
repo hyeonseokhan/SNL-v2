@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { fetchCharacter, ApiError } from '@/lib/lostark-api'
-import { parseApiResponse } from '@/lib/api-parser'
+import { fetchCharacter, ApiError } from '@/lib/api/lostark'
+import { parseApiResponse } from '@/lib/parser/api-parser'
 
 /**
  * @file 캐릭터 조회 API Route

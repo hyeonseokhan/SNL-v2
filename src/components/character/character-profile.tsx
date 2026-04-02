@@ -11,7 +11,7 @@
 
 import Image from "next/image";
 import type { CharData } from "@/types/character";
-import type { CharPalette } from "@/lib/extract-palette";
+import type { CharPalette } from "@/lib/utils/extract-palette";
 
 // ===================================================================
 // 아이콘 SVG

@@ -9,8 +9,8 @@
 
 import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
-import { parseTooltipJson } from "@/lib/tooltip-parser";
-import type { ParsedTooltip, TooltipLine, TooltipSegment } from "@/lib/tooltip-parser";
+import { parseTooltipJson } from "@/lib/parser/tooltip-parser";
+import type { ParsedTooltip, TooltipLine, TooltipSegment } from "@/lib/parser/tooltip-parser";
 
 // ===================================================================
 // 아이콘 헬퍼 (character-equipment와 동일한 3레이어 구조)

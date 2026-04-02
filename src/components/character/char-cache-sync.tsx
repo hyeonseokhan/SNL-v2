@@ -8,9 +8,9 @@
  */
 
 import { useEffect } from 'react'
-import { saveCharCache } from '@/lib/char-cache'
+import { saveCharCache } from '@/lib/cache/char-cache'
 import type { CharData } from '@/types/character'
-import type { CharPalette } from '@/lib/extract-palette'
+import type { CharPalette } from '@/lib/utils/extract-palette'
 
 interface Props {
   name:    string

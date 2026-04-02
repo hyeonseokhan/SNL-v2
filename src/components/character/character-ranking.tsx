@@ -4,7 +4,7 @@
  * 전체 서버 / 해당 서버 × 전체 클래스 / 서버 클래스 2×2 매트릭스
  */
 
-import type { RankingData } from '@/lib/korlark-api'
+import type { RankingData } from '@/lib/api/korlark'
 
 interface CharacterRankingProps {
   ranking: RankingData

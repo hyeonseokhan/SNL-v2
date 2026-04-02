@@ -5,11 +5,11 @@ import { CharacterRanking } from '@/components/character/character-ranking'
 import { CharacterContent } from '@/components/character/character-content'
 import { CharCacheSync } from '@/components/character/char-cache-sync'
 import { MaintenancePage } from '@/components/character/maintenance-page'
-import { fetchCharacter, ApiError } from '@/lib/lostark-api'
-import { parseApiResponse } from '@/lib/api-parser'
-import { extractPalette } from '@/lib/extract-palette'
-import { fetchRanking } from '@/lib/korlark-api'
-import { getMaintenanceInfo } from '@/lib/maintenance'
+import { fetchCharacter, ApiError } from '@/lib/api/lostark'
+import { parseApiResponse } from '@/lib/parser/api-parser'
+import { extractPalette } from '@/lib/utils/extract-palette'
+import { fetchRanking } from '@/lib/api/korlark'
+import { getMaintenanceInfo } from '@/lib/utils/maintenance'
 
 interface PageProps {
   params: Promise<{ name: string }>

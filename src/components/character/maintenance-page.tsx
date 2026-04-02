@@ -9,7 +9,7 @@
  */
 
 import { useState, useEffect } from 'react'
-import { loadCharCache } from '@/lib/char-cache'
+import { loadCharCache } from '@/lib/cache/char-cache'
 import { CharacterProfile } from './character-profile'
 import { CharacterRanking } from './character-ranking'
 import { CharacterContent } from './character-content'
