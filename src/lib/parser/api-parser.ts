@@ -322,9 +322,18 @@ function parseArkPassive(arkPassive: any): {
   const effects: unknown[] = arkPassive.Effects ?? []
   const points: unknown[] = arkPassive.Points ?? []
 
-  const evolutionPts = (points as any[]).find((p) => p.Name === '진화')?.Value ?? 0
-  const enlightenmentPts = (points as any[]).find((p) => p.Name === '깨달음')?.Value ?? 0
-  const leapPts = (points as any[]).find((p) => p.Name === '도약')?.Value ?? 0
+  /** Points의 Description("6랭크 25레벨")에서 랭크·레벨 추출 */
+  function parseRankLevel(pt: any): { value: number; rank: number; level: number } {
+    const value: number = pt?.Value ?? 0
+    const desc: string = pt?.Description ?? ''
+    const rankMatch = desc.match(/(\d+)랭크/)
+    const levelMatch = desc.match(/(\d+)레벨/)
+    return { value, rank: rankMatch ? parseInt(rankMatch[1]) : 0, level: levelMatch ? parseInt(levelMatch[1]) : 0 }
+  }
+
+  const evolution = parseRankLevel((points as any[]).find((p) => p.Name === '진화'))
+  const enlightenment = parseRankLevel((points as any[]).find((p) => p.Name === '깨달음'))
+  const leap = parseRankLevel((points as any[]).find((p) => p.Name === '도약'))
 
   const evolutionNodes: ArkPassiveNode[] = []
   const enlightenmentNodes: ArkPassiveNode[] = []
@@ -337,14 +346,17 @@ function parseArkPassive(arkPassive: any): {
     const nodeName: string = stripHtml(tip.Element_000?.value ?? eff.Name ?? '')
     const levelRaw: string = stripHtml(tip.Element_001?.value?.leftText ?? '')
     const level = parseInt(levelRaw.replace(/[^0-9]/g, '') || '0')
-    const tooltipText: string = stripHtml(tip.Element_002?.value ?? '')
+    const tooltipRaw: string = (tip.Element_002?.value ?? '')
+      .replace(/\|\|/g, '')
+      .replace(/<BR\s*\/?>/gi, '')
+      .trim()
     const icon: string = eff.Icon ?? ''
 
     let tier = 1
     const tierMatch = desc.match(/(\d+)티어/)
     if (tierMatch) tier = parseInt(tierMatch[1])
 
-    const node: ArkPassiveNode = { name: nodeName, level, tier, icon, tooltip: tooltipText }
+    const node: ArkPassiveNode = { name: nodeName, level, tier, icon, tooltip: tooltipRaw }
 
     if (desc.includes('진화')) {
       evolutionNodes.push(node)
@@ -357,9 +369,9 @@ function parseArkPassive(arkPassive: any): {
 
   return {
     arkPassive: {
-      evolution: { points: evolutionPts, karmaRank: 0, karmaLevel: 0, nodes: evolutionNodes },
-      enlightenment: { points: enlightenmentPts, karmaRank: 0, karmaLevel: 0, nodes: enlightenmentNodes },
-      leap: { points: leapPts, karmaRank: 0, karmaLevel: 0, nodes: leapNodes },
+      evolution: { points: evolution.value, karmaRank: evolution.rank, karmaLevel: evolution.level, nodes: evolutionNodes },
+      enlightenment: { points: enlightenment.value, karmaRank: enlightenment.rank, karmaLevel: enlightenment.level, nodes: enlightenmentNodes },
+      leap: { points: leap.value, karmaRank: leap.rank, karmaLevel: leap.level, nodes: leapNodes },
     },
   }
 }

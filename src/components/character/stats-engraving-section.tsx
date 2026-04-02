@@ -8,6 +8,7 @@
 import Image from 'next/image'
 import type { CharData } from '@/types/character'
 import { getEngravingIconUrl } from '@/config/engraving-icons'
+import { parseColoredText } from '@/lib/parse-colored-text'
 
 // ===================================================================
 // 헬퍼
@@ -35,12 +36,13 @@ function SectionLabel({ children, right }: { children: React.ReactNode; right?: 
   )
 }
 
-/** 각인 등급별 텍스트 색상 + 아이콘 경로 */
-const ENGRAVING_GRADE: Record<string, { text: string; icon: string }> = {
-  '유물': { text: 'text-[#C44A00] dark:text-[#FA5D00]', icon: '/icons/engraving/grade-relic.png' },
-  '전설': { text: 'text-[#9A7A00] dark:text-[#FFD200]', icon: '/icons/engraving/grade-legendary.png' },
-  '영웅': { text: 'text-purple-700 dark:text-purple-400', icon: '/icons/engraving/grade-epic.png' },
+/** 각인 등급별 텍스트 색상 + 아이콘 경로 + 등급 한글명 색상 */
+const ENGRAVING_GRADE: Record<string, { text: string; icon: string; color: string }> = {
+  '유물': { text: 'text-[#C44A00] dark:text-[#FA5D00]', icon: '/icons/engraving/grade-relic.png', color: '#FA5D00' },
+  '전설': { text: 'text-[#9A7A00] dark:text-[#FFD200]', icon: '/icons/engraving/grade-legendary.png', color: '#F9AE00' },
+  '영웅': { text: 'text-purple-700 dark:text-purple-400', icon: '/icons/engraving/grade-epic.png', color: '#a855f7' },
 }
+
 
 // ===================================================================
 // 메인 컴포넌트
@@ -129,7 +131,7 @@ export function StatsEngravingSection({ data }: StatsEngravingSectionProps) {
             const iconUrl = getEngravingIconUrl(eng.name)
             const grade = ENGRAVING_GRADE[eng.grade]
             return (
-              <div key={i} className="flex items-center gap-x-2">
+              <div key={i} className="group/eng relative flex items-center gap-x-2">
                 {/* 각인 아이콘 */}
                 {iconUrl ? (
                   <div className="relative size-7 shrink-0 overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
@@ -140,7 +142,7 @@ export function StatsEngravingSection({ data }: StatsEngravingSectionProps) {
                 )}
                 {/* 등급 아이콘 + 레벨 */}
                 {grade && (
-                  <Image src={grade.icon} alt={eng.grade} width={13} height={13} className="shrink-0" />
+                  <img src={grade.icon} alt={eng.grade} width={13} height={13} className="shrink-0" />
                 )}
                 <span className={`text-[15px] font-bold tabular-nums ${grade?.text ?? 'text-tx-body'}`}>
                   x {eng.level}
@@ -152,12 +154,39 @@ export function StatsEngravingSection({ data }: StatsEngravingSectionProps) {
                 {/* 스톤 레벨 */}
                 {eng.stoneLevel > 0 && (
                   <div className="flex items-center gap-0.5">
-                    <Image src="/icons/engraving/stone-blue.png" alt="stone" width={10} height={14} className="shrink-0" />
+                    <img src="/icons/engraving/stone-blue.png" alt="stone" width={10} height={14} className="shrink-0" />
                     <span className="text-[13px] font-medium text-[#007AB8] dark:text-[#00B5FF]">
                       Lv.{eng.stoneLevel}
                     </span>
                   </div>
                 )}
+
+                {/* 호버 툴팁 */}
+                <div className="pointer-events-none absolute bottom-full left-0 z-50 mb-2 overflow-hidden rounded-lg border border-black/[0.08] bg-white opacity-0 shadow-2xl transition-opacity group-hover/eng:opacity-100 dark:border-white/10 dark:bg-[#181b23]"
+                  style={{ minWidth: 200, maxWidth: 320 }}
+                >
+                  {/* 상단: 각인명 + 등급 + Lv */}
+                  <div className="px-3 py-2">
+                    <p className="text-[12px] font-bold text-tx-title">
+                      {eng.name}{' '}
+                      {grade && <span style={{ color: grade.color }}>{eng.grade}</span>}
+                      {' '}Lv.{eng.level}
+                      {eng.stoneLevel > 0 && (
+                        <span className="text-[11px] font-medium text-tx-caption"> (+{eng.stoneLevel})</span>
+                      )}
+                    </p>
+                  </div>
+                  {/* 구분선 */}
+                  <div className="border-t border-black/[0.08] dark:border-white/[0.12]" />
+                  {/* 하단: 효과 설명 */}
+                  {eng.description && (
+                    <div className="px-3 py-2">
+                      <p className="text-[11px] leading-relaxed text-tx-body">
+                        {parseColoredText(eng.description)}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             )
           }) : (

@@ -12,6 +12,7 @@ import { CharacterMenu } from './character-menu'
 import { CharacterEquipment } from './character-equipment'
 import { GemsSection } from './gems-section'
 import { StatsEngravingSection } from './stats-engraving-section'
+import { ArkPassiveSection } from './ark-passive-section'
 import type { CharData } from '@/types/character'
 
 // ===================================================================
@@ -48,6 +49,7 @@ export function CharacterContent({ data }: CharacterContentProps) {
           <CharacterEquipment armory={data.armory} />
           <GemsSection gems={data.gem} />
           <StatsEngravingSection data={data} />
+          <ArkPassiveSection arkPassive={data.arkPassive} />
         </>
       )}
       {activeTab === 'avatar'     && <TabPlaceholder label="아바타" />}
