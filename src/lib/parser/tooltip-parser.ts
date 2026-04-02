@@ -59,6 +59,8 @@ function mapColor(hex: string): string {
     case 'FFFF99': return 'yellow'    // 수치 강조 (거리 등)
     case 'FF7F00': return 'orange'    // 수치 강조 (피해량 등)
     case 'E2C87A': return 'ancient'   // 아이템 설명
+    case '91FE02': return 'green'     // 팔찌 고정 스탯 (신속 등)
+    case '99FF99': return 'lightgreen'  // 팔찌 연녹색 수치
     default:        return 'white'
   }
 }

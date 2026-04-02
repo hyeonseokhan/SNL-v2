@@ -62,6 +62,7 @@ const LINE_COLOR: Record<string, string> = {
   green: "text-[#4CAF50] dark:text-[#73DC04]",
   buff: "text-[#B8960A] dark:text-[#FFFFAC]",
   yellow: "text-[#B8A800] dark:text-[#FFFF99]",
+  lightgreen: "text-[#2E8B57] dark:text-[#99FF99]",
   white: "text-black/80 dark:text-white/80",
   gray: "text-black/45 dark:text-white/40",
 };
@@ -149,12 +150,13 @@ function LineText({ line }: { line: TooltipLine }) {
   }
 
   // 색상이 적용된 라인: 텍스트는 기본색, 수치만 색상 적용
+  // "+3.5%", "-1.2%", "3.5%" (접두사 없는 퍼센트) 모두 매칭
   if (isColored) {
-    const parts = line.text.split(/(\+[\d,.]+%?|-[\d,.]+%?)/);
+    const parts = line.text.split(/([+-]?[\d,.]+%)/);
     return (
       <span className="text-[11px] leading-none">
         {parts.map((part, i) =>
-          /^[+-][\d,.]+%?$/.test(part) ? (
+          /^[+-]?[\d,.]+%$/.test(part) ? (
             <span key={i} className={colorClass}>{part}</span>
           ) : (
             <span key={i} className="text-black/80 dark:text-white/80">{part}</span>
