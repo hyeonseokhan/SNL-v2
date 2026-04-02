@@ -5,7 +5,9 @@
  * 우측: 각인 목록 (등급 색상 + 레벨 + 이름 + 스톤 레벨)
  */
 
+import Image from 'next/image'
 import type { CharData } from '@/types/character'
+import { getEngravingIconUrl } from '@/config/engraving-icons'
 
 // ===================================================================
 // 헬퍼
@@ -33,11 +35,11 @@ function SectionLabel({ children, right }: { children: React.ReactNode; right?: 
   )
 }
 
-/** 각인 등급별 색상 */
-const ENGRAVING_GRADE_COLOR: Record<string, string> = {
-  '유물': 'text-[#C44A00] dark:text-[#FA5D00]',
-  '전설': 'text-[#9A7A00] dark:text-[#FFD200]',
-  '영웅': 'text-purple-700 dark:text-purple-400',
+/** 각인 등급별 텍스트 색상 + 아이콘 경로 */
+const ENGRAVING_GRADE: Record<string, { text: string; icon: string }> = {
+  '유물': { text: 'text-[#C44A00] dark:text-[#FA5D00]', icon: '/icons/engraving/grade-relic.png' },
+  '전설': { text: 'text-[#9A7A00] dark:text-[#FFD200]', icon: '/icons/engraving/grade-legendary.png' },
+  '영웅': { text: 'text-purple-700 dark:text-purple-400', icon: '/icons/engraving/grade-epic.png' },
 }
 
 // ===================================================================
@@ -83,7 +85,7 @@ export function StatsEngravingSection({ data }: StatsEngravingSectionProps) {
       <div className="flex-1 rounded-lg bg-card px-5 py-4 shadow-[1px_1px_10px_0_rgba(72,75,108,0.08)]">
         {/* 기본 특성 */}
         <SectionLabel>기본 특성</SectionLabel>
-        <div className="space-y-2 px-1">
+        <div className="space-y-2 pl-3">
           {/* 공격력 */}
           <div className="flex items-baseline justify-between">
             <span className="text-[13px] font-medium text-tx-body">공격력</span>
@@ -101,7 +103,7 @@ export function StatsEngravingSection({ data }: StatsEngravingSectionProps) {
         {/* 전투 특성 */}
         <div className="mt-5">
           <SectionLabel right={`합계 ${total.toLocaleString()}`}>전투 특성</SectionLabel>
-          <div className="grid grid-cols-3 gap-x-6 gap-y-2.5 px-1">
+          <div className="grid grid-cols-3 gap-x-6 gap-y-2.5 pl-3">
             {statEntries.map(({ label, value }) => {
               const isMain = value > 100
               return (
@@ -120,26 +122,41 @@ export function StatsEngravingSection({ data }: StatsEngravingSectionProps) {
       </div>
 
       {/* ── 우측: 각인 ── */}
-      <div className="flex-1 rounded-lg bg-card px-4 py-3 shadow-[1px_1px_10px_0_rgba(72,75,108,0.08)]">
+      <div className="flex-1 rounded-lg bg-card px-5 py-4 shadow-[1px_1px_10px_0_rgba(72,75,108,0.08)]">
         <SectionLabel>각인</SectionLabel>
-        <div className="space-y-2">
+        <div className="space-y-2.5 pl-3">
           {engraving.length > 0 ? engraving.map((eng, i) => {
-            const gradeColor = ENGRAVING_GRADE_COLOR[eng.grade] ?? 'text-tx-body'
+            const iconUrl = getEngravingIconUrl(eng.name)
+            const grade = ENGRAVING_GRADE[eng.grade]
             return (
               <div key={i} className="flex items-center gap-x-2">
-                {/* 등급 + 레벨 */}
-                <span className={`text-[12px] font-bold ${gradeColor}`}>
+                {/* 각인 아이콘 */}
+                {iconUrl ? (
+                  <div className="relative size-7 shrink-0 overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
+                    <Image src={iconUrl} alt={eng.name} fill className="object-cover" sizes="28px" unoptimized />
+                  </div>
+                ) : (
+                  <div className="size-7 shrink-0 rounded-full bg-black/10 dark:bg-white/10" />
+                )}
+                {/* 등급 아이콘 + 레벨 */}
+                {grade && (
+                  <Image src={grade.icon} alt={eng.grade} width={13} height={13} className="shrink-0" />
+                )}
+                <span className={`text-[15px] font-bold tabular-nums ${grade?.text ?? 'text-tx-body'}`}>
                   x {eng.level}
                 </span>
                 {/* 각인명 */}
-                <span className="text-[12px] font-medium text-tx-body">
+                <span className="text-[15px] font-bold text-tx-title">
                   {eng.name}
                 </span>
                 {/* 스톤 레벨 */}
                 {eng.stoneLevel > 0 && (
-                  <span className="ml-auto text-[10px] text-[#007AB8] dark:text-[#00B5FF]">
-                    Lv.{eng.stoneLevel}
-                  </span>
+                  <div className="flex items-center gap-0.5">
+                    <Image src="/icons/engraving/stone-blue.png" alt="stone" width={10} height={14} className="shrink-0" />
+                    <span className="text-[13px] font-medium text-[#007AB8] dark:text-[#00B5FF]">
+                      Lv.{eng.stoneLevel}
+                    </span>
+                  </div>
                 )}
               </div>
             )

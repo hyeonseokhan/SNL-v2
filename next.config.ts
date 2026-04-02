@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "cdn.korlark.com",
       },
+      {
+        protocol: "https",
+        hostname: "pica.korlark.com",
+      },
     ],
   },
 };

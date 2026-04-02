@@ -56,11 +56,11 @@ export default async function CharacterPage({ params }: PageProps) {
   }
 
   return (
-    <div className="mx-auto w-[1100px] pb-12 pt-6">
+    <div className="mx-auto w-[960px] pb-12 pt-6">
       <CharCacheSync name={decodedName} data={data} palette={palette} ranking={ranking} />
 
       <div className="flex gap-2">
-        <aside className="w-[272px] shrink-0 space-y-2">
+        <aside className="w-[256px] shrink-0 space-y-2">
           <CharacterProfile data={data} palette={palette} />
           {ranking && (
             <CharacterRanking ranking={ranking} serverName={data.profile.serverName} />
