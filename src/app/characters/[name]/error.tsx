@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getMaintenanceInfo } from '@/lib/maintenance'
@@ -12,12 +11,7 @@ export default function CharacterError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  const [isMaintenance, setIsMaintenance] = useState(false)
-
-  useEffect(() => {
-    const { isMaintenance } = getMaintenanceInfo()
-    setIsMaintenance(isMaintenance)
-  }, [])
+  const { isMaintenance } = getMaintenanceInfo()
 
   return (
     <div className="flex min-h-[50vh] items-center justify-center">

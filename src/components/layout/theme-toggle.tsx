@@ -1,19 +1,11 @@
 'use client'
 
 import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => setMounted(true), [])
-
-  if (!mounted) {
-    return <Button variant="ghost" size="icon" className="size-9" />
-  }
+  const { theme, setTheme, resolvedTheme } = useTheme()
 
   return (
     <Button
@@ -21,8 +13,9 @@ export function ThemeToggle() {
       size="icon"
       className="size-9"
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      suppressHydrationWarning
     >
-      {theme === 'dark' ? (
+      {resolvedTheme === 'dark' ? (
         <Sun className="size-4" />
       ) : (
         <Moon className="size-4" />

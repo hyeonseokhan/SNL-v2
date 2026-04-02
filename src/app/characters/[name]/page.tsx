@@ -24,45 +24,29 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
+async function fetchCharacterData(name: string) {
+  const raw = await fetchCharacter(name)
+  const data = parseApiResponse(raw)
+  const [palette, ranking] = await Promise.all([
+    extractPalette(data.profile.characterImage ?? ''),
+    fetchRanking(name),
+  ])
+  return { data, palette, ranking }
+}
+
 export default async function CharacterPage({ params }: PageProps) {
   const { name } = await params
   const decodedName = decodeURIComponent(name)
 
+  let data, palette, ranking
+
   try {
-    const raw = await fetchCharacter(decodedName)
-    const data = parseApiResponse(raw)
-    const [palette, ranking] = await Promise.all([
-      extractPalette(data.profile.characterImage ?? ''),
-      fetchRanking(decodedName),
-    ])
-
-    return (
-      <div className="mx-auto w-[1100px] pb-12 pt-6">
-        {/* 조회 성공 시 localStorage에 캐싱 */}
-        <CharCacheSync name={decodedName} data={data} palette={palette} ranking={ranking} />
-
-        <div className="flex gap-2">
-          {/* 좌측 패널: 프로필 + 랭킹 */}
-          <aside className="w-[272px] shrink-0 space-y-2">
-            <CharacterProfile data={data} palette={palette} />
-            {ranking && (
-              <CharacterRanking ranking={ranking} serverName={data.profile.serverName} />
-            )}
-          </aside>
-
-          {/* 우측 패널: 메뉴 + 콘텐츠 */}
-          <div className="min-w-0 flex-1">
-            <CharacterContent data={data} />
-          </div>
-        </div>
-      </div>
-    )
+    ({ data, palette, ranking } = await fetchCharacterData(decodedName))
   } catch (err) {
     if (err instanceof ApiError && err.status === 404) {
       notFound()
     }
 
-    // 점검 시간이면 캐시 fallback 페이지로
     const { isMaintenance, endsAt } = getMaintenanceInfo()
     if (isMaintenance) {
       return <MaintenancePage characterName={decodedName} endsAt={endsAt} />
@@ -70,4 +54,23 @@ export default async function CharacterPage({ params }: PageProps) {
 
     throw err
   }
+
+  return (
+    <div className="mx-auto w-[1100px] pb-12 pt-6">
+      <CharCacheSync name={decodedName} data={data} palette={palette} ranking={ranking} />
+
+      <div className="flex gap-2">
+        <aside className="w-[272px] shrink-0 space-y-2">
+          <CharacterProfile data={data} palette={palette} />
+          {ranking && (
+            <CharacterRanking ranking={ranking} serverName={data.profile.serverName} />
+          )}
+        </aside>
+
+        <div className="min-w-0 flex-1">
+          <CharacterContent data={data} />
+        </div>
+      </div>
+    </div>
+  )
 }

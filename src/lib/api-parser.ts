@@ -222,7 +222,6 @@ function parseEquipment(equipment: any[]) {
   }
 
   // ── equipList (방어구 6종) ──────────────────────────────
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const equipList = equipment
     .filter((e) => EQUIP_TYPES.includes(e.Type))
     .map((e) => {

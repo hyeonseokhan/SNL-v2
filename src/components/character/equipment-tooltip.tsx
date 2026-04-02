@@ -300,7 +300,6 @@ export function EquipmentTooltip({
   icon,
   itemType = "",
   children,
-  side = "right",
 }: EquipmentTooltipProps) {
   const parsed = parseTooltipJson(tooltipRaw);
   const wrapperRef = useRef<HTMLDivElement>(null);
