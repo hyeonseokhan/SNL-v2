@@ -150,13 +150,13 @@ function LineText({ line }: { line: TooltipLine }) {
   }
 
   // 색상이 적용된 라인: 텍스트는 기본색, 수치만 색상 적용
-  // "+3.5%", "-1.2%", "3.5%" (접두사 없는 퍼센트) 모두 매칭
+  // "+83", "+117" (정수), "+3.5%", "3.5%" (퍼센트) 모두 매칭
   if (isColored) {
-    const parts = line.text.split(/([+-]?[\d,.]+%)/);
+    const parts = line.text.split(/([+-]\d[\d,.]*%?|\d[\d,.]*%)/);
     return (
       <span className="text-[11px] leading-none">
         {parts.map((part, i) =>
-          /^[+-]?[\d,.]+%$/.test(part) ? (
+          /^[+-]\d[\d,.]*%?$|^\d[\d,.]*%$/.test(part) ? (
             <span key={i} className={colorClass}>{part}</span>
           ) : (
             <span key={i} className="text-black/80 dark:text-white/80">{part}</span>
