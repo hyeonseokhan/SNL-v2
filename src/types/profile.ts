@@ -53,6 +53,7 @@ export interface CharProfile {
  * @property expert - 숙련 스탯
  * @property combatPower - 전투력
  * @property attack - 공격력
+ * @property maxHp - 최대 생명력
  */
 export interface CharStats {
   critical: number
@@ -63,4 +64,5 @@ export interface CharStats {
   expert: number
   combatPower: number
   attack: number
+  maxHp: number
 }

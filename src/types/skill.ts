@@ -34,12 +34,18 @@ export interface SkillData {
  * 각인 효과 정보
  *
  * @property name - 각인명 (예: "돌격대장", "아드레날린")
- * @property level - 각인 레벨
- * @property icon - 각인 아이콘 URL
+ * @property level - 각인 레벨 (1~4)
+ * @property grade - 등급 (예: "유물", "전설")
+ * @property stoneLevel - 어빌리티 스톤 각인 레벨 (0이면 스톤 미적용)
+ * @property description - 효과 설명 (HTML 포함 가능)
+ * @property icon - 각인 아이콘 URL (현재 API 미제공)
  */
 export interface EngravingData {
   name: string
   level: number
+  grade: string
+  stoneLevel: number
+  description: string
   icon: string
 }
 

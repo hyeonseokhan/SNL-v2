@@ -64,6 +64,7 @@ function parseProfile(armoryProfile: any) {
     expert: 0,
     combatPower: 0,
     attack: 0,
+    maxHp: 0,
   }
   for (const s of armoryProfile.Stats ?? []) {
     switch (s.Type) {
@@ -87,6 +88,9 @@ function parseProfile(armoryProfile: any) {
         break
       case '공격력':
         stats.attack = Number(s.Value)
+        break
+      case '최대 생명력':
+        stats.maxHp = Number(s.Value)
         break
     }
   }
@@ -360,13 +364,24 @@ function parseArkPassive(arkPassive: any): {
   }
 }
 
+/**
+ * 각인 데이터 파싱
+ *
+ * ArmoryEngraving.ArkPassiveEffects에서 각인 정보를 추출합니다.
+ *
+ * @param armoryEngraving - 공식 API의 ArmoryEngraving 응답
+ * @returns 파싱된 각인 배열
+ */
 function parseEngraving(armoryEngraving: any) {
   const effects: any[] = armoryEngraving?.ArkPassiveEffects ?? []
   return {
     engraving: effects.map((e) => ({
-      name: e.Name ?? '',
-      level: e.Level ?? 0,
-      icon: e.Icon ?? '',
+      name: (e.Name ?? '') as string,
+      level: (e.Level ?? 0) as number,
+      grade: (e.Grade ?? '') as string,
+      stoneLevel: (e.AbilityStoneLevel ?? 0) as number,
+      description: (e.Description ?? '') as string,
+      icon: (e.Icon ?? '') as string,
     })),
   }
 }

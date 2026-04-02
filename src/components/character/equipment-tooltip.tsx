@@ -314,7 +314,10 @@ export function EquipmentTooltip({
     const nameEl = wrapper.querySelector("p.truncate") as HTMLElement | null;
     const anchor = nameEl ?? wrapper;
     const rect = anchor.getBoundingClientRect();
-    setPos({ x: rect.left, y: rect.top });
+    // zoom이 적용된 환경에서 getBoundingClientRect()는 확대된 좌표를 반환하지만
+    // fixed 포지셔닝에도 zoom이 적용되므로 zoom factor로 나눠 보정
+    const zoom = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+    setPos({ x: rect.left / zoom, y: rect.top / zoom });
   }, []);
 
   const handleLeave = useCallback(() => setPos(null), []);

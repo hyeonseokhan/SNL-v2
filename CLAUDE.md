@@ -58,6 +58,11 @@ src/
 - shadcn/ui CSS 변수 기반 (globals.css의 :root / .dark)
 - next-themes로 다크/라이트 전환
 
+### 타이포그래피
+- 상세 지침: [docs/TYPOGRAPHY.md](docs/TYPOGRAPHY.md) 참조
+- 텍스트 색상은 반드시 `text-tx-*` 토큰 사용 (`text-black/*`, `text-white/*` 직접 지정 금지)
+- 숫자에는 `tabular-nums` 필수
+
 ## CLI 응답 언어
 
 **중요**: 항상 한국어로 응답하고 설명해야 합니다.

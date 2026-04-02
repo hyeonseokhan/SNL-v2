@@ -60,10 +60,6 @@ function extractOptionPercent(option: string | undefined): number {
  * @param gem - 보석 데이터
  */
 function GemIcon({ gem }: { gem: GemData }) {
-  const tooltipText = gem.skillName && gem.effect
-    ? `${gem.skillName} — ${gem.effect}`
-    : gem.name
-
   return (
     <div className="group/gem relative">
       <div
@@ -120,15 +116,12 @@ function GroupBracket({ label, count, gemCount }: { label: string; count: number
   const GEM_SIZE = 36
   const GEM_GAP = 8
   return (
-    <div className="flex flex-col items-center" style={{ width: gemCount * GEM_SIZE + (gemCount - 1) * GEM_GAP }}>
-      <div className="flex w-full items-center gap-0.5">
-        <div className="h-2 w-px bg-black/30 dark:bg-white/30" />
-        <div className="h-px flex-1 bg-black/30 dark:bg-white/30" />
-        <div className="h-2 w-px bg-black/30 dark:bg-white/30" />
-      </div>
-      <span className="mt-0.5 text-[10px] text-black/80 dark:text-white/80">
+    <div className="flex w-full items-center" style={{ width: gemCount * GEM_SIZE + (gemCount - 1) * GEM_GAP }}>
+      <div className="h-px flex-1 bg-black/30 dark:bg-white/30" />
+      <span className="shrink-0 px-1.5 text-[10px] text-black/80 dark:text-white/80">
         {label} {count}
       </span>
+      <div className="h-px flex-1 bg-black/30 dark:bg-white/30" />
     </div>
   )
 }

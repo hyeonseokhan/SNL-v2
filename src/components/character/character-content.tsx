@@ -11,6 +11,7 @@ import { useState } from 'react'
 import { CharacterMenu } from './character-menu'
 import { CharacterEquipment } from './character-equipment'
 import { GemsSection } from './gems-section'
+import { StatsEngravingSection } from './stats-engraving-section'
 import type { CharData } from '@/types/character'
 
 // ===================================================================
@@ -46,6 +47,7 @@ export function CharacterContent({ data }: CharacterContentProps) {
         <>
           <CharacterEquipment armory={data.armory} />
           <GemsSection gems={data.gem} />
+          <StatsEngravingSection data={data} />
         </>
       )}
       {activeTab === 'avatar'     && <TabPlaceholder label="아바타" />}
