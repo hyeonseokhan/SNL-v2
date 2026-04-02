@@ -173,7 +173,6 @@ function StatsAndEngravingSection({ data }: { data: CharData }) {
           {engraving.length > 0 ? engraving.map((eng, i) => (
             <div key={i} className="flex items-center gap-x-2.5">
               {eng.icon && (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img src={eng.icon} alt="" className="size-8 rounded-full" />
               )}
               <span className="text-sm">
@@ -268,7 +267,6 @@ function ArkPassiveColumn({
         {section.nodes.map((node, i) => (
           <div key={i} className="flex items-center gap-1.5">
             {node.icon && (
-              // eslint-disable-next-line @next/next/no-img-element
               <img src={node.icon} alt="" className="size-5 rounded" />
             )}
             <span className="text-xs text-tx-caption">{node.tier}티어</span>

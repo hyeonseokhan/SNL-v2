@@ -105,7 +105,6 @@ function parseLineColor(html: string): TooltipLine {
 }
 
 /** ItemPartBox value → TooltipSection */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseItemPartBox(val: any): TooltipSection | null {
   if (!val) return null
   const header = stripHtml(val.Element_000 ?? '')
@@ -123,11 +122,9 @@ function parseItemPartBox(val: any): TooltipSection | null {
 }
 
 /** IndentStringGroup (어빌리티 스톤 각인) → TooltipSection */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseIndentGroup(val: any): TooltipSection | null {
   if (!val) return null
   const header = stripHtml(val.Element_000?.topStr ?? '') || '각인 효과'
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const contentStr: Record<string, any> = val.Element_000?.contentStr ?? {}
   const lines: TooltipLine[] = []
 
@@ -181,7 +178,6 @@ export function parseTooltipJson(raw: string): ParsedTooltip | null {
   const name = stripHtml((tip.Element_000?.value as string) ?? '')
 
   // ── ItemTitle ────────────────────────────────────────────────────
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const titleVal = tip.Element_001?.value as any
   const gradeType  = stripHtml(titleVal?.leftStr0 ?? '')
   const quality    = titleVal?.qualityValue ?? -1
@@ -207,7 +203,6 @@ export function parseTooltipJson(raw: string): ParsedTooltip | null {
     if (!el || !el.value) continue
 
     const type = el.type
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const val = el.value as any
 
     if (type === 'ItemPartBox') {

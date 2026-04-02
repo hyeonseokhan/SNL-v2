@@ -48,7 +48,6 @@ export class ApiError extends Error {
 // API 호출
 // ===================================================================
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function fetchCharacter(name: string): Promise<any> {
   // ── 개발용 mock (MOCK_CHAR=true 일 때) ──────────────────────────
   if (process.env.MOCK_CHAR === 'true') {

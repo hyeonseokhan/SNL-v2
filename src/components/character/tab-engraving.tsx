@@ -25,7 +25,6 @@ export function TabEngraving({ data }: TabEngravingProps) {
             className="flex items-center gap-3 rounded-lg bg-secondary/50 p-3"
           >
             {eng.icon && (
-              // eslint-disable-next-line @next/next/no-img-element
               <img src={eng.icon} alt="" className="size-9 rounded-lg" />
             )}
             <div className="min-w-0 flex-1">

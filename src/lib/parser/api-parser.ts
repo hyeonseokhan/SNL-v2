@@ -5,7 +5,7 @@
  * CharData 포맷으로 변환합니다.
  */
 
-import type { CharData, ArkPassiveSection, ArkPassiveNode } from '@/types/character'
+import type { CharData, CharStats, ArkPassiveSection, ArkPassiveNode } from '@/types/character'
 
 // ===================================================================
 // 내부 헬퍼
@@ -15,7 +15,6 @@ function stripHtml(s: string | undefined): string {
   return (s ?? '').replace(/<[^>]+>/g, '').trim()
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseTooltip(raw: string | undefined): Record<string, any> {
   if (!raw) return {}
   try {
@@ -55,9 +54,17 @@ function parseBangleOptions(raw: string): string[] {
 // 섹션별 파서
 // ===================================================================
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseProfile(armoryProfile: any) {
-  const stats: Record<string, number> = {}
+  const stats: CharStats = {
+    critical: 0,
+    haste: 0,
+    special: 0,
+    suppress: 0,
+    patience: 0,
+    expert: 0,
+    combatPower: 0,
+    attack: 0,
+  }
   for (const s of armoryProfile.Stats ?? []) {
     switch (s.Type) {
       case '치명':
@@ -113,19 +120,16 @@ function parseProfile(armoryProfile: any) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseEquipment(equipment: any[]) {
   const EQUIP_TYPES = ['무기', '투구', '어깨', '상의', '하의', '장갑']
 
   // ── 헬퍼 ──────────────────────────────────────────────
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function itemQuality(item: any): number {
     if (!item) return -1
     const t = parseTooltip(item.Tooltip)
     return t.Element_001?.value?.qualityValue ?? -1
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function itemLevelAndTier(item: any): { itemLevel: number; tier: number } {
     if (!item) return { itemLevel: 0, tier: 0 }
     const t = parseTooltip(item.Tooltip)
@@ -138,7 +142,6 @@ function parseEquipment(equipment: any[]) {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function accEnlightenment(item: any): number {
     if (!item) return 0
     const t = parseTooltip(item.Tooltip)
@@ -151,7 +154,6 @@ function parseEquipment(equipment: any[]) {
     return 0
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function accOptions(item: any): string[] {
     if (!item) return []
     const t = parseTooltip(item.Tooltip)
@@ -159,7 +161,6 @@ function parseEquipment(equipment: any[]) {
     return parseEnhanceOptions(raw)
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function bangOptions(item: any): string[] {
     if (!item) return []
     const t = parseTooltip(item.Tooltip)
@@ -167,7 +168,6 @@ function parseEquipment(equipment: any[]) {
     return parseBangleOptions(raw)
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function stoneOptions(item: any): string[] {
     if (!item) return []
     const t = parseTooltip(item.Tooltip)
@@ -177,7 +177,6 @@ function parseEquipment(equipment: any[]) {
   }
 
   /** 스톤 각인 효과 + 레벨 보너스 추출 */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function stoneEngravingsAndBonus(item: any): { engravings: { name: string; level: number; isNegative: boolean }[]; levelBonus: string } {
     if (!item) return { engravings: [], levelBonus: '' }
     const t = parseTooltip(item.Tooltip)
@@ -206,7 +205,6 @@ function parseEquipment(equipment: any[]) {
   }
 
   /** 보주 낙원력 추출 */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function orbParadisePower(item: any): number {
     if (!item) return 0
     const t = parseTooltip(item.Tooltip)
@@ -257,7 +255,6 @@ function parseEquipment(equipment: any[]) {
   const charmItem = equipment.find((e) => e.Type === '부적')
   const orbItem = equipment.find((e) => e.Type === '보주')
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function accInfo(item: any) {
     const { tier } = itemLevelAndTier(item)
     return {
@@ -272,7 +269,6 @@ function parseEquipment(equipment: any[]) {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function namedInfo(item: any) {
     const { tier } = itemLevelAndTier(item)
     return {
@@ -312,7 +308,6 @@ function parseEquipment(equipment: any[]) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseArkPassive(arkPassive: any): {
   arkPassive: {
     evolution: ArkPassiveSection
@@ -323,18 +318,14 @@ function parseArkPassive(arkPassive: any): {
   const effects: unknown[] = arkPassive.Effects ?? []
   const points: unknown[] = arkPassive.Points ?? []
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const evolutionPts = (points as any[]).find((p) => p.Name === '진화')?.Value ?? 0
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const enlightenmentPts = (points as any[]).find((p) => p.Name === '깨달음')?.Value ?? 0
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const leapPts = (points as any[]).find((p) => p.Name === '도약')?.Value ?? 0
 
   const evolutionNodes: ArkPassiveNode[] = []
   const enlightenmentNodes: ArkPassiveNode[] = []
   const leapNodes: ArkPassiveNode[] = []
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   for (const eff of effects as any[]) {
     const desc = eff.Description ?? ''
     const tip = parseTooltip(eff.ToolTip)
@@ -369,9 +360,7 @@ function parseArkPassive(arkPassive: any): {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseEngraving(armoryEngraving: any) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const effects: any[] = armoryEngraving?.ArkPassiveEffects ?? []
   return {
     engraving: effects.map((e) => ({
@@ -382,16 +371,12 @@ function parseEngraving(armoryEngraving: any) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseGems(armoryGem: any) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const gems: any[] = armoryGem?.Gems ?? []
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const effects: any[] = Array.isArray(armoryGem?.Effects)
     ? armoryGem.Effects
     : Object.values(armoryGem?.Effects ?? {})
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const effMap: Record<number, any> = {}
   for (const e of effects) {
     if (e.GemIdx !== undefined) effMap[e.GemIdx] = e
@@ -409,13 +394,10 @@ function parseGems(armoryGem: any) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseCard(armoryCard: any): { card: string } {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const effects: any[] = armoryCard?.Effects ?? []
   if (!effects.length) return { card: '' }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const items: any[] = effects[0]?.Items ?? []
   let cardName = ''
   let maxAwake = 0
@@ -431,11 +413,8 @@ function parseCard(armoryCard: any): { card: string } {
   return { card: cardName }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseArkGrid(arkGrid: any) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const slots: any[] = arkGrid?.Slots ?? []
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const effects: any[] = Array.isArray(arkGrid?.Effects)
     ? arkGrid.Effects
     : Object.values(arkGrid?.Effects ?? {})
@@ -455,16 +434,13 @@ function parseArkGrid(arkGrid: any) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseSkills(armorySkills: any[]) {
   return {
     skills: (armorySkills ?? []).map((s) => ({
       name: s.Name ?? '',
       level: s.Level ?? 0,
       tripods: (s.Tripods ?? [])
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .filter((t: any) => t.IsSelected)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .map((t: any) => ({
           name: t.Name ?? '',
           tier: t.Tier ?? 0,
@@ -478,7 +454,6 @@ function parseSkills(armorySkills: any[]) {
 // 메인 파서
 // ===================================================================
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseApiResponse(apiData: any): CharData {
   const { stats, profile } = parseProfile(apiData.ArmoryProfile ?? {})
   const { armory } = parseEquipment(apiData.ArmoryEquipment ?? [])
@@ -491,7 +466,7 @@ export function parseApiResponse(apiData: any): CharData {
 
   return {
     profile,
-    stats: stats as CharData['stats'],
+    stats,
     armory,
     arkPassive,
     engraving,

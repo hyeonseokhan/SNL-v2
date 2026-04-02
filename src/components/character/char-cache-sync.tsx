@@ -16,7 +16,6 @@ interface Props {
   name:    string
   data:    CharData
   palette: CharPalette
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ranking: any
 }
 

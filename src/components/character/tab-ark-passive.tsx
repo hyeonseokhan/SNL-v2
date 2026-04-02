@@ -49,7 +49,6 @@ function SectionCard({
                 {nodes.map((node, i) => (
                   <div key={i} className="flex items-center gap-2 py-0.5">
                     {node.icon && (
-                      // eslint-disable-next-line @next/next/no-img-element
                       <img src={node.icon} alt="" className="size-6 rounded" />
                     )}
                     <span className="text-xs text-tx-caption">{tier}티어</span>

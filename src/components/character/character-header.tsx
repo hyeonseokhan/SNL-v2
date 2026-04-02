@@ -12,7 +12,6 @@ export function CharacterHeader({ data }: CharacterHeaderProps) {
       {/* --- 배경 이미지 --- */}
       {profile.characterImage && (
         <div className="absolute inset-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={profile.characterImage}
             alt=""
@@ -26,7 +25,6 @@ export function CharacterHeader({ data }: CharacterHeaderProps) {
         {/* --- 캐릭터 이미지 --- */}
         {profile.characterImage && (
           <div className="hidden w-48 shrink-0 sm:block">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={profile.characterImage}
               alt={profile.characterName}

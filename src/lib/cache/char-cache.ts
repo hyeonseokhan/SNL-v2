@@ -8,7 +8,6 @@
 import type { CharData } from '@/types/character'
 import type { CharPalette } from '@/lib/utils/extract-palette'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type RankingData = any
 
 const CACHE_VERSION = 'v1'
