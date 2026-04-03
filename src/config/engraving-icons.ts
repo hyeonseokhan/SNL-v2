@@ -187,3 +187,9 @@ export function getEngravingIconUrl(name: string): string {
   const path = COMBAT_ENGRAVING_ICONS[name] ?? CLASS_ENGRAVING_ICONS[name]
   return path ? `${CDN}/${path}` : ''
 }
+
+/** 일반 각인(전투 각인) 이름 목록 */
+export const COMBAT_ENGRAVING_NAMES = Object.keys(COMBAT_ENGRAVING_ICONS)
+
+/** 직업 각인 이름 목록 */
+export const CLASS_ENGRAVING_NAMES = Object.keys(CLASS_ENGRAVING_ICONS)

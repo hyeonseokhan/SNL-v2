@@ -19,6 +19,7 @@ import { StatsEngravingSection } from './stats-engraving-section'
 import { ArkPassiveSection } from './ark-passive-section'
 import { ArkGridSection } from './ark-grid-section'
 import { CardSection } from './card-section'
+import { SimulatorTab } from './simulator/simulator-tab'
 import { useCharacterStore } from '@/stores/character-store'
 import type { CharData } from '@/types/character'
 
@@ -66,7 +67,7 @@ export function CharacterContent({ data: ssrData }: CharacterContentProps) {
           <CardSection card={data.card} />
         </>
       )}
-      {activeTab === 'simulator'  && <TabPlaceholder label="시뮬레이터" />}
+      {activeTab === 'simulator'  && <SimulatorTab />}
       {activeTab === 'skills'     && <TabPlaceholder label="스킬" />}
       {activeTab === 'characters' && <TabPlaceholder label="보유 캐릭터" />}
     </div>
