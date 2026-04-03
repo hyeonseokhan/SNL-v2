@@ -19,7 +19,7 @@ export function parseColoredText(html: string): React.ReactNode[] {
   const nodes: React.ReactNode[] = []
   let lastIndex = 0
   let match: RegExpExecArray | null
-  const re = /<FONT COLOR='(#[0-9a-fA-F]+)'>(.*?)<\/FONT>/gi
+  const re = /<FONT\s+(?:COLOR|color)\s*=\s*'(#[0-9a-fA-F]+)'>(.*?)<\/FONT>/gi
   while ((match = re.exec(html)) !== null) {
     if (match.index > lastIndex) {
       nodes.push(html.slice(lastIndex, match.index))

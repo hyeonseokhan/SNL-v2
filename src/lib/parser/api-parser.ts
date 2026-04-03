@@ -464,14 +464,37 @@ function parseArkGrid(arkGrid: any) {
 
   return {
     arkGrid: {
-      slots: slots.map((s) => ({
-        name: s.Name ?? '',
-        grade: s.Grade ?? '',
-        type: s.Type ?? '',
-      })),
+      slots: slots.map((s) => {
+        const tip = parseTooltip(s.Tooltip)
+        // 고정 인덱스 대신 ItemPartBox의 라벨 키워드로 검색
+        let coreType = ''
+        let coreWillpower = ''
+        let coreOptions = ''
+        for (let i = 0; i <= 15; i++) {
+          const key = `Element_${String(i).padStart(3, '0')}`
+          const el = tip[key]
+          if (el?.type !== 'ItemPartBox') continue
+          const label = el.value?.Element_000 ?? ''
+          const value = el.value?.Element_001 ?? ''
+          if (label.includes('코어 타입')) coreType = stripHtml(value)
+          else if (label.includes('코어 공급 의지력')) coreWillpower = value
+          else if (label.includes('코어 옵션') && !label.includes('발동 조건')) coreOptions = value
+        }
+        return {
+          name: s.Name ?? '',
+          grade: s.Grade ?? '',
+          type: s.Type ?? '',
+          icon: s.Icon ?? '',
+          point: s.Point ?? 0,
+          coreType,
+          coreWillpower,
+          coreOptions,
+        }
+      }),
       effects: effects.map((e) => ({
         name: e.Name ?? '',
-        description: stripHtml(e.Description ?? ''),
+        level: e.Level ?? 0,
+        description: e.Tooltip ?? e.Description ?? '',
       })),
     },
   }

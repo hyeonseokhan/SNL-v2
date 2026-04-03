@@ -56,16 +56,26 @@ export interface ArkGridSlot {
   name: string
   grade: string
   type: string
+  icon: string
+  point: number
+  /** 코어 타입 (예: "혼돈 - 달") */
+  coreType: string
+  /** 코어 공급 의지력 (HTML 포함) */
+  coreWillpower: string
+  /** 코어 옵션 — 포인트별 효과 (HTML FONT COLOR 태그 포함) */
+  coreOptions: string
 }
 
 /**
  * 아크그리드 효과
  *
  * @property name - 효과명 (예: "공격력", "추가 피해")
- * @property description - 효과 설명
+ * @property level - 효과 레벨
+ * @property description - 효과 설명 (HTML FONT COLOR 태그 포함)
  */
 export interface ArkGridEffect {
   name: string
+  level: number
   description: string
 }
 
