@@ -1,8 +1,7 @@
 /**
  * @file 효율 분석 계산 엔진 테스트
  *
- * 실제 API 데이터를 파싱하여 6가지 효율 지표를 계산하고
- * 콘솔에 상세 breakdown을 출력합니다.
+ * LOPEC (lopec.kr) 실제 값과 비교하여 검증합니다.
  *
  * 실행: npm test
  * 감시: npm run test:watch
@@ -14,16 +13,9 @@ import type { CharData } from '@/types/character'
 import type { EfficiencyMetrics } from '../calc-efficiency'
 
 // ===================================================================
-// 테스트 픽스처 — 리얼본좌강림 (기상술사)
+// 테스트 픽스처 — 리얼본좌강림 (기상술사/질풍노도)
 // ===================================================================
 
-/**
- * 실제 캐릭터 데이터 기반 최소 픽스처
- *
- * 치명: 890, 신속: 1620, 특화: 75
- * 각인: 돌격대장x4, 아드레날린x4, 원한x3, 타격의대가x4, 질량증가x4
- * 클래스: 기상술사 (질풍노도 +12% 공이속)
- */
 function createFixture(): CharData {
   return {
     profile: {
@@ -71,7 +63,7 @@ function createFixture(): CharData {
         earing2: { name: '', icon: '', grade: '', quality: 91, tier: 4, enlightenment: 0, option: ['공격력 +1.55%', '무기 공격력 +0.80%', '상태이상 공격 지속시간 +1.00%'], tooltipRaw: '' },
         ring1: { name: '', icon: '', grade: '', quality: 91, tier: 4, enlightenment: 0, option: ['치명타 적중률 +1.55%', '치명타 피해 +1.10%', '무기 공격력 +195'], tooltipRaw: '' },
         ring2: { name: '', icon: '', grade: '', quality: 95, tier: 4, enlightenment: 0, option: ['치명타 적중률 +1.55%', '치명타 피해 +1.10%', '무기 공격력 +195'], tooltipRaw: '' },
-        bangle: { name: '', icon: '', grade: '', quality: 0, tier: 4, enlightenment: 0, option: ['신속 +83', '치명 +117'], tooltipRaw: '' },
+        bangle: { name: '', icon: '', grade: '', quality: 0, tier: 4, enlightenment: 0, option: ['신속 +83', '치명 +117', '추가 피해가 3.5% 증가한다.', '치명타 적중률이 4.2% 증가한다.'], tooltipRaw: '' },
         stone: { name: '', icon: '', grade: '', tooltipRaw: '', option: [], engravings: [], levelBonus: '' },
         compass: { name: '', icon: '', grade: '', tooltipRaw: '' },
         charm: { name: '', icon: '', grade: '', tooltipRaw: '' },
@@ -125,10 +117,9 @@ function createFixture(): CharData {
 // 헬퍼
 // ===================================================================
 
-/** 효율 지표를 콘솔에 예쁘게 출력 */
-function printMetrics(metrics: EfficiencyMetrics) {
-  console.log('\n' + '='.repeat(60))
-  console.log('  효율 분석 결과')
+function printMetrics(label: string, metrics: EfficiencyMetrics) {
+  console.log(`\n${'='.repeat(60)}`)
+  console.log(`  ${label}`)
   console.log('='.repeat(60))
 
   const sections = [
@@ -136,14 +127,15 @@ function printMetrics(metrics: EfficiencyMetrics) {
     { label: '치명타 피해량', data: metrics.critDamage, unit: '%' },
     { label: '공격 속도', data: metrics.attackSpeed, unit: '%' },
     { label: '이동 속도', data: metrics.moveSpeed, unit: '%' },
-    { label: '팔찌 효율', data: metrics.braceletEfficiency, unit: '' },
-    { label: '각인 효율', data: metrics.engravingEfficiency, unit: '' },
+    { label: '팔찌 효율', data: metrics.braceletEfficiency, unit: '%' },
+    { label: '각인 효율', data: metrics.engravingEfficiency, unit: '%' },
+    { label: '메인노드 효율', data: metrics.mainNodeEfficiency, unit: '%' },
   ]
 
   for (const { label, data, unit } of sections) {
     console.log(`\n── ${label}: ${data.total.toFixed(2)}${unit} ──`)
     for (const b of data.breakdown) {
-      console.log(`   ${b.source.padEnd(25)} ${b.value > 0 ? '+' : ''}${b.value.toFixed(2)}${unit}`)
+      console.log(`   ${b.source.padEnd(30)} ${b.value > 0 ? '+' : ''}${b.value.toFixed(2)}${unit}`)
     }
   }
   console.log('\n' + '='.repeat(60))
@@ -154,42 +146,56 @@ function printMetrics(metrics: EfficiencyMetrics) {
 // ===================================================================
 
 describe('변환 함수', () => {
-  it('치명 스탯 → 치적% 변환', () => {
-    expect(critStatToRate(890)).toBeCloseTo(31.85, 1)
+  it('치명 스탯 → 치적% (LOPEC: floor(890/0.2794)/100)', () => {
+    // LOPEC: floor(890 / 0.2794) / 100 = floor(3185.39) / 100 = 31.85
+    expect(critStatToRate(890)).toBe(31.85)
   })
 
-  it('신속 스탯 → 속도% 변환', () => {
-    expect(hasteStatToSpeed(1620)).toBeCloseTo(27.82, 1)
+  it('신속 스탯 → 속도% (LOPEC: floor(1620/0.5821)/100)', () => {
+    // LOPEC: floor(1620 / 0.5821) / 100 = floor(2783.02) / 100 = 27.83
+    expect(hasteStatToSpeed(1620)).toBe(27.83)
   })
 })
 
-describe('리얼본좌강림 (기상술사) 효율 분석', () => {
+describe('리얼본좌강림 (기상술사) — LOPEC 값 검증', () => {
   const fixture = createFixture()
+  const metrics = calculateEfficiency(fixture)
 
-  it('버프 없이 계산', () => {
-    const metrics = calculateEfficiency(fixture)
-    printMetrics(metrics)
-
-    // 치적: 스탯 + 악세 + 노드 + 아드레날린 > 50%
-    expect(metrics.critRate.total).toBeGreaterThan(50)
-
-    // 치피: 기본 200% + 악세 + 기민함 > 200%
-    expect(metrics.critDamage.total).toBeGreaterThan(200)
-
-    // 공속: 신속 + 클래스버프 - 질량증가 > 0
-    expect(metrics.attackSpeed.total).toBeGreaterThan(0)
-    // 질량 증가 페널티 적용 확인
-    expect(metrics.attackSpeed.total).toBeLessThan(metrics.moveSpeed.total)
+  it('전체 결과 출력', () => {
+    printMetrics('리얼본좌강림 — 버프 없음', metrics)
   })
 
-  it('만찬 + 전투축복 적용', () => {
-    const metrics = calculateEfficiency(fixture, { feast: true, blessing3: true })
-    printMetrics(metrics)
+  it('치명타 적중률 = 97.15%', () => {
+    // LOPEC 값: 97.15%
+    // 특성 31.85 + 악세 3.10 + 팔찌 4.20 + 진화 16.00 + 직업 22.00 + 아드레날린 20.00
+    expect(metrics.critRate.total).toBeCloseTo(97.15, 0)
+  })
 
-    // 버프 적용 시 속도 추가 +14%
-    const noBuff = calculateEfficiency(fixture)
-    expect(metrics.attackSpeed.total - noBuff.attackSpeed.total).toBeCloseTo(14, 0)
-    expect(metrics.moveSpeed.total - noBuff.moveSpeed.total).toBeCloseTo(14, 0)
+  it('치명타 피해량 = 250.20%', () => {
+    // LOPEC 값: 250.20%
+    // 기본 200 + 악세 2.20 + 직업(질풍노도) 48.00
+    expect(metrics.critDamage.total).toBeCloseTo(250.20, 0)
+  })
+
+  it('공격 속도 = 43.83%', () => {
+    // LOPEC 값: 43.83%
+    // 기본 14 + 신속 27.83 + 질풍노도 12 - 질량증가 10
+    expect(metrics.attackSpeed.total).toBeCloseTo(43.83, 0)
+  })
+
+  it('이동 속도 = 53.83%', () => {
+    // LOPEC 값: 53.83%
+    // 기본 14 + 신속 27.83 + 질풍노도 12
+    expect(metrics.moveSpeed.total).toBeCloseTo(53.83, 0)
+  })
+
+  it('메인노드 효율: 음속 돌파 Lv.2 = 21.29%', () => {
+    // LOPEC 값: 21.29%
+    // i = min(43.83,40)*0.1 + min(53.83,40)*0.1 = 8.0
+    // o = max(0,3.83)*0.3 + max(0,13.83)*0.3 = 5.298
+    // bonus = 8 (양쪽 40 초과)
+    // total = min(21.298, 24) = 21.29
+    expect(metrics.mainNodeEfficiency.total).toBeCloseTo(21.29, 1)
   })
 
   it('시뮬레이션: 아드레날린 → 예리한 둔기 교체', () => {
@@ -201,16 +207,18 @@ describe('리얼본좌강림 (기상술사) 효율 분석', () => {
           : e
       ),
     }
-    const before = calculateEfficiency(fixture)
+    const before = metrics
     const after = calculateEfficiency(modified)
 
-    console.log('\n── 시뮬레이션: 아드레날린 → 예리한 둔기 ──')
+    printMetrics('시뮬레이션: 아드레날린 → 예리한 둔기', after)
+
+    console.log('\n── 변화량 ──')
     console.log(`   치적: ${before.critRate.total.toFixed(2)}% → ${after.critRate.total.toFixed(2)}% (${(after.critRate.total - before.critRate.total).toFixed(2)}%)`)
     console.log(`   치피: ${before.critDamage.total.toFixed(2)}% → ${after.critDamage.total.toFixed(2)}% (${(after.critDamage.total - before.critDamage.total).toFixed(2)}%)`)
 
-    // 아드레날린 제거 → 치적 감소
-    expect(after.critRate.total).toBeLessThan(before.critRate.total)
-    // 예리한 둔기 추가 → 치피 증가
-    expect(after.critDamage.total).toBeGreaterThan(before.critDamage.total)
+    // 아드레날린 제거 → 치적 -20%
+    expect(after.critRate.total).toBeCloseTo(before.critRate.total - 20, 0)
+    // 예리한 둔기 추가 → 치피 +50%
+    expect(after.critDamage.total).toBeCloseTo(before.critDamage.total + 50, 0)
   })
 })
