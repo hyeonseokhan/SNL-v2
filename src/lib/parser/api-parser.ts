@@ -437,23 +437,50 @@ function parseGems(armoryGem: any) {
   }
 }
 
-function parseCard(armoryCard: any): { card: string } {
-  const effects: any[] = armoryCard?.Effects ?? []
-  if (!effects.length) return { card: '' }
+function parseCard(armoryCard: any) {
+  // 개별 카드
+  const rawCards: any[] = armoryCard?.Cards ?? []
+  const cards = rawCards.map((c) => ({
+    slot: c.Slot ?? 0,
+    name: c.Name ?? '',
+    icon: c.Icon ?? '',
+    grade: c.Grade ?? '',
+    awakeCount: c.AwakeCount ?? 0,
+    awakeTotal: c.AwakeTotal ?? 5,
+  }))
 
-  const items: any[] = effects[0]?.Items ?? []
-  let cardName = ''
-  let maxAwake = 0
-  for (const item of items) {
-    const m = item.Name?.match(/(\d+)각성합계/)
-    const awake = m ? parseInt(m[1]) : 0
-    if (awake >= maxAwake) {
-      maxAwake = awake
-      const nameMatch = item.Name?.match(/^(.+?)\s+\d+세트\s+\((\d+)각성합계\)/)
-      if (nameMatch) cardName = `${nameMatch[1]} ${nameMatch[2]}각`
+  // 세트 효과
+  const effects: any[] = armoryCard?.Effects ?? []
+  const setEffects: { name: string; description: string }[] = []
+  let setName = ''
+  let setSummary = ''
+
+  for (const eff of effects) {
+    for (const item of eff.Items ?? []) {
+      const rawName: string = item.Name ?? ''
+      const desc: string = item.Description ?? ''
+
+      // 세트명 추출 (첫 번째 항목에서)
+      const nameMatch = rawName.match(/^(.+?)\s+\d+세트/)
+      if (nameMatch && !setName) setName = nameMatch[1]
+
+      // 표시용 조건명: "2세트", "12각성" 등
+      const setCountMatch = rawName.match(/(\d+)세트/)
+      const awakeMatch = rawName.match(/\((\d+)각성합계\)/)
+      const label = awakeMatch ? `${awakeMatch[1]}각성` : setCountMatch ? `${setCountMatch[1]}세트` : rawName
+
+      setEffects.push({ name: label, description: desc })
+
+      // 요약: 가장 마지막 효과 기준
+      if (awakeMatch) {
+        setSummary = `${setName} ${awakeMatch[1]}각`
+      } else if (setCountMatch && !setSummary) {
+        setSummary = `${setName} ${setCountMatch[1]}세트`
+      }
     }
   }
-  return { card: cardName }
+
+  return { card: { cards, setName, setSummary, setEffects } }
 }
 
 function parseArkGrid(arkGrid: any) {

@@ -35,6 +35,9 @@ export type {
   ArkGridData,
 } from './ark'
 
+// 카드
+export type { CardInfo, CardSetEffect, CardData } from './card'
+
 // ===================================================================
 // 메인 캐릭터 데이터
 // ===================================================================
@@ -43,6 +46,7 @@ import type { CharProfile, CharStats } from './profile'
 import type { ArmoryData } from './equipment'
 import type { EngravingData, GemData, SkillData } from './skill'
 import type { ArkPassiveSection, ArkGridData } from './ark'
+import type { CardData } from './card'
 
 /**
  * 캐릭터 전체 데이터
@@ -56,7 +60,7 @@ import type { ArkPassiveSection, ArkGridData } from './ark'
  * @property arkPassive - 아크패시브 (진화/깨달음/도약)
  * @property engraving - 각인 목록
  * @property gem - 보석 목록
- * @property card - 카드 세트 설명 문자열
+ * @property card - 카드 데이터 (개별 카드 + 세트 효과)
  * @property arkGrid - 아크그리드 (슬롯 + 효과)
  * @property skills - 전투 스킬 목록
  * @property uniqueKey - 캐릭터 고유 키 (캐릭터명)
@@ -72,7 +76,7 @@ export interface CharData {
   }
   engraving: EngravingData[]
   gem: GemData[]
-  card: string
+  card: CardData
   arkGrid: ArkGridData
   skills: SkillData[]
   uniqueKey: string

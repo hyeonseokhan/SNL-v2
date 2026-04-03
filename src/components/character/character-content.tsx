@@ -14,6 +14,7 @@ import { GemsSection } from './gems-section'
 import { StatsEngravingSection } from './stats-engraving-section'
 import { ArkPassiveSection } from './ark-passive-section'
 import { ArkGridSection } from './ark-grid-section'
+import { CardSection } from './card-section'
 import type { CharData } from '@/types/character'
 
 // ===================================================================
@@ -52,6 +53,7 @@ export function CharacterContent({ data }: CharacterContentProps) {
           <StatsEngravingSection data={data} />
           <ArkPassiveSection arkPassive={data.arkPassive} />
           <ArkGridSection arkGrid={data.arkGrid} />
+          <CardSection card={data.card} />
         </>
       )}
       {activeTab === 'avatar'     && <TabPlaceholder label="아바타" />}
