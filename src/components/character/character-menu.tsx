@@ -3,7 +3,7 @@
 /**
  * @file 캐릭터 상세 메뉴 탭바
  *
- * 탭 항목: 능력치 / 스킬 / 보유 캐릭터
+ * 탭 항목: 능력치 / 시뮬레이터 / 스킬 / 보유 캐릭터
  * 활성 탭 상태는 부모(CharacterContent)에서 관리합니다.
  */
 
@@ -15,6 +15,7 @@ import type { TabId } from './character-content'
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'stats',      label: '능력치' },
+  { id: 'simulator',  label: '시뮬레이터' },
   { id: 'skills',     label: '스킬' },
   { id: 'characters', label: '보유 캐릭터' },
 ]
