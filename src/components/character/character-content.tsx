@@ -21,7 +21,7 @@ import type { CharData } from '@/types/character'
 // 탭 타입
 // ===================================================================
 
-export type TabId = 'stats' | 'avatar' | 'skills' | 'characters'
+export type TabId = 'stats' | 'skills' | 'characters'
 
 // ===================================================================
 // 메인
@@ -56,7 +56,6 @@ export function CharacterContent({ data }: CharacterContentProps) {
           <CardSection card={data.card} />
         </>
       )}
-      {activeTab === 'avatar'     && <TabPlaceholder label="아바타" />}
       {activeTab === 'skills'     && <TabPlaceholder label="스킬" />}
       {activeTab === 'characters' && <TabPlaceholder label="보유 캐릭터" />}
     </div>

@@ -67,20 +67,7 @@ const LINE_COLOR: Record<string, string> = {
   gray: "text-black/45 dark:text-white/40",
 };
 
-const GRADE_NAME_COLOR: Record<string, string> = {
-  고대: "text-[#7A5C1E] dark:text-[#E3C7A1]",
-  유물: "text-[#C44A00] dark:text-[#FA5D00]",
-  전설: "text-[#9A7A00] dark:text-[#FFD200]",
-  영웅: "text-purple-700 dark:text-purple-400",
-  희귀: "text-blue-700 dark:text-blue-400",
-};
-
-function gradeNameColor(gradeType: string): string {
-  for (const [grade, cls] of Object.entries(GRADE_NAME_COLOR)) {
-    if (gradeType.includes(grade)) return cls;
-  }
-  return "text-black/80 dark:text-white/80";
-}
+import { gradeTextClassFromType as gradeNameColor } from '@/config/grade-colors'
 
 function qualityBarColor(q: number): string {
   if (q >= 100) return "bg-amber-400";

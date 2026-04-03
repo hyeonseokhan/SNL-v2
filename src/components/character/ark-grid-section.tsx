@@ -7,6 +7,7 @@
 
 import Image from 'next/image'
 import type { ArkGridData } from '@/types/character'
+import { gradeTextClass } from '@/config/grade-colors'
 import { parseColoredText } from '@/lib/parse-colored-text'
 import { SectionLabel } from './section-label'
 
@@ -26,12 +27,12 @@ function parseCoreOptions(html: string): React.ReactNode[] {
   ))
 }
 
-/** 코어 등급별 이름 색상 + 배지 배경색 */
-const CORE_GRADE: Record<string, { text: string; badge: string }> = {
-  '고대': { text: 'text-[#dcc999]', badge: 'bg-[#dcc999]/20 text-[#dcc999]' },
-  '유물': { text: 'text-[#FA5D00]', badge: 'bg-[#FA5D00]/20 text-[#FA5D00]' },
-  '전설': { text: 'text-[#F9AE00]', badge: 'bg-[#F9AE00]/20 text-[#F9AE00]' },
-  '영웅': { text: 'text-purple-400', badge: 'bg-purple-400/20 text-purple-400' },
+/** 코어 등급별 배지 배경색 (등급 텍스트 색상은 gradeTextClass 사용) */
+const CORE_BADGE: Record<string, string> = {
+  '고대': 'bg-[#dcc999]/20 text-[#dcc999]',
+  '유물': 'bg-[#FA5D00]/20 text-[#FA5D00]',
+  '전설': 'bg-[#F9AE00]/20 text-[#F9AE00]',
+  '영웅': 'bg-purple-400/20 text-purple-400',
 }
 
 // ===================================================================
@@ -65,10 +66,10 @@ export function ArkGridSection({ arkGrid }: { arkGrid: ArkGridData }) {
               ) : (
                 <div className="size-7 shrink-0 rounded-md bg-black/10 dark:bg-white/10" />
               )}
-              <span className={`text-[12px] font-medium ${CORE_GRADE[slot.grade]?.text ?? 'text-tx-body'}`}>
+              <span className={`text-[12px] font-medium ${gradeTextClass(slot.grade)}`}>
                 {slot.name}
               </span>
-              <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${CORE_GRADE[slot.grade]?.badge ?? 'bg-white/[0.08] text-tx-caption'}`}>
+              <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${CORE_BADGE[slot.grade] ?? 'bg-white/[0.08] text-tx-caption'}`}>
                 {slot.point}P
               </span>
 
@@ -77,7 +78,7 @@ export function ArkGridSection({ arkGrid }: { arkGrid: ArkGridData }) {
                 style={{ minWidth: 240, maxWidth: 340 }}
               >
                 <div className="px-3 py-2">
-                  <p className={`text-[13px] font-bold ${CORE_GRADE[slot.grade]?.text ?? 'text-tx-body'}`}>
+                  <p className={`text-[13px] font-bold ${gradeTextClass(slot.grade)}`}>
                     {slot.name}
                   </p>
                 </div>

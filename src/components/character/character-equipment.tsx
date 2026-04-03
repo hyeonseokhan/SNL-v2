@@ -14,16 +14,7 @@ import type { ArmoryData, EquipItem, AccessoryInfo, NamedItem, StoneEngraving } 
 // 헬퍼
 // ===================================================================
 
-function gradeNameColor(grade: string): string {
-  switch (grade) {
-    case '고대':   return 'text-[#7A5C1E] dark:text-[#E3C7A1]'
-    case '유물':   return 'text-[#C44A00] dark:text-[#FA5D00]'
-    case '전설':   return 'text-[#9A7A00] dark:text-[#FFD200]'
-    case '영웅':   return 'text-purple-700 dark:text-purple-400'
-    case '희귀':   return 'text-blue-700 dark:text-blue-400'
-    default:       return 'text-tx-body'
-  }
-}
+import { gradeTextClass as gradeNameColor } from '@/config/grade-colors'
 
 /** 공식 전투정보실 q0-q6 색상 시스템 */
 function qualityColor(q: number): string {
