@@ -157,6 +157,60 @@ export const ENLIGHTENMENT_POINT_OPTIONS = [
 ]
 
 // ===================================================================
+// 팔찌 효과
+// ===================================================================
+
+/** 팔찌 스탯 종류 */
+export const BRACELET_STAT_TYPES = [
+  '없음', '힘', '민첩', '지능', '치명', '특화', '신속', '제압', '인내', '숙련', '체력',
+] as const
+
+/**
+ * 팔찌 특수 효과 옵션
+ *
+ * @property label - 표시명
+ * @property tiers - [유물 하, 유물 중, 유물 상, 고대 상]
+ * @property property - 효율 계산 속성 키
+ */
+export interface BraceletEffect {
+  label: string
+  tiers: [string, string, string, string]
+  property: string
+}
+
+/** 팔찌 특수 효과 목록 */
+export const BRACELET_EFFECTS: BraceletEffect[] = [
+  { label: '공이속', tiers: ['+3%', '+4%', '+5%', '+6%'], property: 'atkMoveSpeed' },
+  { label: '치적 + 치주피', tiers: ['2.6%/1.5%', '3.4%/1.5%', '4.2%/1.5%', '5.0%/1.5%'], property: 'critRate_critFinalDmg' },
+  { label: '치피 + 치주피', tiers: ['5.2%/1.5%', '6.8%/1.5%', '8.4%/1.5%', '10.0%/1.5%'], property: 'critDmg_critFinalDmg' },
+  { label: '적주피', tiers: ['+1.5%', '+2.0%', '+2.5%', '+3.0%'], property: 'finalDmg' },
+  { label: '적주피 + 무력화', tiers: ['1.5%/3.5%', '2%/4%', '2.5%/4.5%', '3%/5%'], property: 'finalDmg_stagger' },
+  { label: '쿨 + 적주피', tiers: ['2%/4%', '2%/4.5%', '2%/5%', '2%/5.5%'], property: 'cdr_finalDmg' },
+  { label: '추피 + 악마', tiers: ['2.0%/2.5%', '2.5%/2.5%', '3.0%/2.5%', '3.5%/2.5%'], property: 'addDmg_devil' },
+  { label: '무공 (고정)', tiers: ['8100', '9200', '10300', '11400'], property: 'weaponAtkPlus' },
+  { label: '무공 (스택형)', tiers: ['6000', '6960', '7920', '8880'], property: 'weaponAtkStack' },
+  { label: '무공 (30중첩)', tiers: ['7020', '8005', '8990', '9975'], property: 'weaponAtk30' },
+  { label: '백어택 피해', tiers: ['+2.0%', '+2.5%', '+3.0%', '+3.5%'], property: 'backDmg' },
+  { label: '헤드어택 피해', tiers: ['+2.0%', '+2.5%', '+3.0%', '+3.5%'], property: 'headDmg' },
+  { label: '타대 피해', tiers: ['+2.0%', '+2.5%', '+3.0%', '+3.5%'], property: 'normalDmg' },
+  { label: '추가 피해', tiers: ['+2.5%', '+3.0%', '+3.5%', '+4.0%'], property: 'addDmg' },
+  { label: '아군 공강', tiers: ['Lv1', 'Lv2', 'Lv3', 'Lv4'], property: 'allyAtkBuff' },
+]
+
+/** 팔찌 효과 등급 라벨 */
+export const BRACELET_TIER_LABELS = ['유물 하', '유물 중', '유물 상', '고대 상'] as const
+
+// ===================================================================
+// 도핑 / 버프
+// ===================================================================
+
+/** 도핑 옵션 */
+export const BUFF_OPTIONS = [
+  { label: '만찬', property: 'atkMoveSpeed', value: 0.05 },
+  { label: '전투 축복 III', property: 'atkMoveSpeed', value: 0.09 },
+] as const
+
+// ===================================================================
 // 기타
 // ===================================================================
 

@@ -8,11 +8,14 @@
  */
 
 import { useCharacterStore } from '@/stores/character-store'
+import { SimCombatStats } from './sim-combat-stats'
 import { SimEngraving } from './sim-engraving'
 import { SimGem } from './sim-gem'
-import { SimStone } from './sim-stone'
 import { SimAccessory } from './sim-accessory'
+import { SimBracelet } from './sim-bracelet'
+import { SimStone } from './sim-stone'
 import { SimArkPassive } from './sim-ark-passive'
+import { SimBuffs } from './sim-buffs'
 
 /**
  * 시뮬레이터 탭
@@ -41,11 +44,14 @@ export function SimulatorTab() {
       </div>
 
       {/* 수정 섹션 */}
+      <SimCombatStats />
       <SimEngraving />
       <SimGem />
       <SimAccessory />
+      <SimBracelet />
       <SimStone />
       <SimArkPassive />
+      <SimBuffs />
     </div>
   )
 }
