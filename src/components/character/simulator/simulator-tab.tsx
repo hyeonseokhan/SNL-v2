@@ -11,6 +11,7 @@ import { useCharacterStore } from '@/stores/character-store'
 import { SimEngraving } from './sim-engraving'
 import { SimGem } from './sim-gem'
 import { SimStone } from './sim-stone'
+import { SimAccessory } from './sim-accessory'
 import { SimArkPassive } from './sim-ark-passive'
 
 /**
@@ -42,6 +43,7 @@ export function SimulatorTab() {
       {/* 수정 섹션 */}
       <SimEngraving />
       <SimGem />
+      <SimAccessory />
       <SimStone />
       <SimArkPassive />
     </div>
