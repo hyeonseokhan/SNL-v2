@@ -47,7 +47,7 @@ function ArkColumn({
           {style.label}
         </span>
         {section.karmaRank > 0 && (
-          <span className="text-[15px] font-bold tabular-nums text-tx-title">
+          <span className="text-[15px] font-bold tabular-nums text-tx-body">
             {section.karmaRank}랭크 {section.karmaLevel}레벨
           </span>
         )}
@@ -70,7 +70,7 @@ function ArkColumn({
             )}
             {/* 티어 + 이름 + Lv */}
             <span className="text-[11px] text-tx-caption">{node.tier}티어</span>
-            <span className="text-[12px] font-medium text-tx-title">{node.name}</span>
+            <span className="text-[12px] font-medium text-tx-body">{node.name}</span>
             <span className="text-[11px] tabular-nums text-tx-label">Lv.{node.level}</span>
 
             {/* 호버 툴팁 */}
@@ -80,7 +80,7 @@ function ArkColumn({
               >
                 {/* 상단: 카테고리 + 스킬명 + Lv */}
                 <div className="px-3 py-2">
-                  <p className="text-[12px] font-bold text-tx-title">
+                  <p className="text-[12px] font-bold text-tx-body">
                     {node.name} Lv.{node.level}
                   </p>
                 </div>

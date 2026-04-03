@@ -91,12 +91,12 @@ export function StatsEngravingSection({ data }: StatsEngravingSectionProps) {
           {/* 공격력 */}
           <div className="flex items-baseline justify-between">
             <span className="text-[13px] font-medium text-tx-body">공격력</span>
-            <span className="text-[16px] font-bold tabular-nums text-tx-title">{stats.attack.toLocaleString()}</span>
+            <span className="text-[16px] font-bold tabular-nums text-tx-body">{stats.attack.toLocaleString()}</span>
           </div>
           {/* 최대 생명력 */}
           <div className="flex items-baseline justify-between">
             <span className="text-[13px] font-medium text-tx-body">최대 생명력</span>
-            <span className="text-[16px] font-bold tabular-nums text-tx-title">
+            <span className="text-[16px] font-bold tabular-nums text-tx-body">
               {stats.maxHp > 0 ? stats.maxHp.toLocaleString() : '-'}
             </span>
           </div>
@@ -113,7 +113,7 @@ export function StatsEngravingSection({ data }: StatsEngravingSectionProps) {
                   <span className={`text-[12px] ${isMain ? 'font-medium text-tx-label' : 'text-tx-muted'}`}>
                     {label}
                   </span>
-                  <span className={`text-[15px] font-bold tabular-nums ${isMain ? 'text-tx-title' : 'text-tx-muted'}`}>
+                  <span className={`text-[15px] font-bold tabular-nums ${isMain ? 'text-tx-body' : 'text-tx-muted'}`}>
                     {value.toLocaleString()}
                   </span>
                 </div>
@@ -148,7 +148,7 @@ export function StatsEngravingSection({ data }: StatsEngravingSectionProps) {
                   x {eng.level}
                 </span>
                 {/* 각인명 */}
-                <span className="text-[15px] font-bold text-tx-title">
+                <span className="text-[15px] font-bold text-tx-body">
                   {eng.name}
                 </span>
                 {/* 스톤 레벨 */}
@@ -167,7 +167,7 @@ export function StatsEngravingSection({ data }: StatsEngravingSectionProps) {
                 >
                   {/* 상단: 각인명 + 등급 + Lv */}
                   <div className="px-3 py-2">
-                    <p className="text-[12px] font-bold text-tx-title">
+                    <p className="text-[12px] font-bold text-tx-body">
                       {eng.name}{' '}
                       {grade && <span style={{ color: grade.color }}>{eng.grade}</span>}
                       {' '}Lv.{eng.level}

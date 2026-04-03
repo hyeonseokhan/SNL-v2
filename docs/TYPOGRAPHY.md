@@ -23,8 +23,8 @@
 
 | 토큰 | Tailwind 클래스 | Light (oklch) | Dark (oklch) | 용도 |
 |------|----------------|---------------|--------------|------|
-| title | `text-tx-title` | 0.10 0 0 | 1 0 0 / 0.95 | 핵심 수치, 제목 |
-| body | `text-tx-body` | 0.20 0 0 | 1 0 0 / 0.80 | 일반 텍스트, 라벨 |
+| title | `text-tx-title` | 0.10 0 0 | 1 0 0 / 0.95 | 페이지 제목, 캐릭터명 (헤딩 전용) |
+| body | `text-tx-body` | 0.20 0 0 | 1 0 0 / 0.80 | 수치, 이름, 일반 텍스트 (기본 본문) |
 | label | `text-tx-label` | 0.40 0 0 | 1 0 0 / 0.60 | 보조 라벨, 부가 설명 |
 | caption | `text-tx-caption` | 0.55 0 0 | 1 0 0 / 0.45 | 캡션, 합계 등 부가 정보 |
 | muted | `text-tx-muted` | 0.65 0 0 | 1 0 0 / 0.30 | 비활성, 비주요 수치 |
@@ -90,11 +90,17 @@
 자주 사용하는 클래스 조합을 정리합니다.
 
 ```
-핵심 수치:    text-[16px] font-bold  tabular-nums text-tx-title
-강조 수치:    text-[15px] font-bold  tabular-nums text-tx-title
+핵심 수치:    text-[16px] font-bold  tabular-nums text-tx-body
+강조 수치:    text-[15px] font-bold  tabular-nums text-tx-body
+강조 이름:    text-[15px] font-bold               text-tx-body
 일반 라벨:    text-[13px] font-medium              text-tx-body
 보조 라벨:    text-[12px] font-medium              text-tx-label
 캡션:        text-[10px]                           text-tx-caption
 비활성 수치:  text-[15px] font-bold  tabular-nums  text-tx-muted
 배지 숫자:    text-[9px]  font-bold                text-white
 ```
+
+**`text-tx-title` 사용 제한**: 페이지 제목, 캐릭터명, 히어로 등 진짜 헤딩에만 사용합니다.
+수치·이름·라벨 등 컴포넌트 내부 텍스트는 `text-tx-body` 이하를 사용합니다.
+`tx-title`(dark: white/95%)과 `tx-body`(dark: white/80%)의 차이는 미묘하지만,
+넓은 범위에 `tx-title`을 사용하면 장비·보석 컴포넌트와 톤이 맞지 않습니다.
