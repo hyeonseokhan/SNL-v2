@@ -15,9 +15,9 @@ import { parseColoredText } from '@/lib/parse-colored-text'
 
 /** 아크패시브 카테고리별 스타일 */
 const ARK_STYLE = {
-  evolution: { label: '진화', bg: 'bg-[#c4a33a]', text: 'text-white', color: '#c4a33a' },
-  enlightenment: { label: '깨달음', bg: 'bg-[#3a7ac4]', text: 'text-white', color: '#3a7ac4' },
-  leap: { label: '도약', bg: 'bg-[#3ac46a]', text: 'text-white', color: '#3ac46a' },
+  evolution: { label: '진화', bg: 'bg-[#c4a33a]', text: 'text-white' },
+  enlightenment: { label: '깨달음', bg: 'bg-[#3a7ac4]', text: 'text-white' },
+  leap: { label: '도약', bg: 'bg-[#3ac46a]', text: 'text-white' },
 } as const
 
 // ===================================================================
@@ -41,7 +41,6 @@ function ArkColumn({
 
   return (
     <div className="min-w-0 flex-1">
-      {/* 헤더: 배지 + 랭크/레벨 + 포인트 pill */}
       <div className="mb-3 flex items-center gap-2">
         <span className={`shrink-0 rounded px-2 py-0.5 text-[11px] font-bold ${style.bg} ${style.text}`}>
           {style.label}
@@ -56,11 +55,9 @@ function ArkColumn({
         </span>
       </div>
 
-      {/* 노드 목록 */}
       <div className="space-y-2 border-l-2 border-black/5 pl-2 dark:border-white/10">
         {section.nodes.length > 0 ? section.nodes.map((node, i) => (
           <div key={i} className="group/node relative flex items-center gap-1.5">
-            {/* 노드 아이콘 */}
             {node.icon ? (
               <div className="relative size-6 shrink-0 overflow-hidden rounded-md">
                 <Image src={node.icon} alt={node.name} fill className="object-contain" sizes="24px" unoptimized />
@@ -68,7 +65,6 @@ function ArkColumn({
             ) : (
               <div className="size-6 shrink-0 rounded bg-black/10 dark:bg-white/10" />
             )}
-            {/* 티어 + 이름 + Lv */}
             <span className="text-[11px] text-tx-caption">{node.tier}티어</span>
             <span className="text-[12px] font-medium text-tx-body">{node.name}</span>
             <span className="text-[11px] tabular-nums text-tx-label">Lv.{node.level}</span>
@@ -78,15 +74,12 @@ function ArkColumn({
               <div className="pointer-events-none absolute bottom-full left-0 z-50 mb-2 overflow-hidden rounded-lg border border-black/[0.08] bg-white opacity-0 shadow-2xl transition-opacity group-hover/node:opacity-100 dark:border-white/10 dark:bg-[#181b23]"
                 style={{ minWidth: 180, maxWidth: 300 }}
               >
-                {/* 상단: 카테고리 + 스킬명 + Lv */}
                 <div className="px-3 py-2">
                   <p className="text-[12px] font-bold text-tx-body">
                     {node.name} Lv.{node.level}
                   </p>
                 </div>
-                {/* 구분선 */}
                 <div className="border-t border-black/[0.08] dark:border-white/[0.12]" />
-                {/* 하단: 효과 설명 */}
                 <div className="px-3 py-2">
                   <p className="text-[11px] leading-relaxed text-tx-body">
                     {parseColoredText(node.tooltip)}

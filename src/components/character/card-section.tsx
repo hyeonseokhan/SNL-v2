@@ -11,46 +11,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import type { CardData, CardInfo, CardSetEffect } from '@/types/character'
-
-// ===================================================================
-// 상수
-// ===================================================================
-
-/**
- * 카드 등급 → 프레임 스프라이트 X 오프셋 (%)
- *
- * card-grade.png: 869x200, 6등급 프레임이 가로로 연결
- * API 등급 문자열 → data-grade 숫자 매핑
- */
-const CARD_GRADE_OFFSET: Record<string, string> = {
-  '일반': '0%',
-  '고급': '20%',
-  '희귀': '40%',
-  '영웅': '60%',
-  '전설': '80%',
-}
-
-// ===================================================================
-// 헬퍼
-// ===================================================================
-
-/**
- * 섹션 라벨 — pill 배지 + 가로선 + 우측 콘텐츠
- *
- * @param children - 라벨 텍스트
- * @param right - 우측 콘텐츠
- */
-function SectionLabel({ children, right }: { children: React.ReactNode; right?: React.ReactNode }) {
-  return (
-    <div className="mb-4 flex items-center gap-3">
-      <span className="shrink-0 rounded-full bg-primary/15 px-3 py-1 text-[12px] font-bold text-primary">
-        {children}
-      </span>
-      <div className="h-px flex-1 bg-black/10 dark:bg-white/15" />
-      {right}
-    </div>
-  )
-}
+import { SectionLabel } from './section-label'
 
 // ===================================================================
 // 서브 컴포넌트
@@ -110,8 +71,7 @@ function CardItem({ card }: { card: CardInfo }) {
   const frameX = GRADE_POS[card.grade] ?? 0
   const awakeMaxPx = card.awakeTotal * AWAKE_DOT_W
   const awakePx = card.awakeCount * AWAKE_DOT_W
-  const awakeBgW = awakeMaxPx
-  const awakeBgH = AWAKE_H * 2
+  const awakeBgSize = `${awakeMaxPx}px ${AWAKE_H * 2}px`
 
   return (
     <div className="flex flex-col items-center gap-1">
@@ -151,7 +111,7 @@ function CardItem({ card }: { card: CardInfo }) {
               width: awakeMaxPx,
               height: AWAKE_H,
               backgroundImage: 'url(/icons/card/card-awake.png)',
-              backgroundSize: `${awakeBgW}px ${awakeBgH}px`,
+              backgroundSize: awakeBgSize,
               backgroundPosition: '0 0',
             }}
           >
@@ -160,7 +120,7 @@ function CardItem({ card }: { card: CardInfo }) {
               className="absolute inset-0"
               style={{
                 backgroundImage: 'url(/icons/card/card-awake.png)',
-                backgroundSize: `${awakeBgW}px ${awakeBgH}px`,
+                backgroundSize: awakeBgSize,
                 backgroundPosition: `0 -${AWAKE_H}px`,
                 width: awakePx,
               }}
@@ -168,7 +128,6 @@ function CardItem({ card }: { card: CardInfo }) {
           </div>
         )}
       </div>
-      {/* 카드 이름 */}
       <span className="text-[10px] text-tx-caption">{card.name}</span>
     </div>
   )
@@ -240,14 +199,12 @@ export function CardSection({ card }: { card: CardData }) {
         카드
       </SectionLabel>
 
-      {/* 카드 6장 가로 배치 */}
       <div className="flex justify-center gap-3">
         {card.cards.map((c) => (
           <CardItem key={c.slot} card={c} />
         ))}
       </div>
 
-      {/* 세트 효과 (토글) */}
       {expanded && card.setEffects.length > 0 && (
         <SetEffectList effects={card.setEffects} />
       )}

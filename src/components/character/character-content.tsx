@@ -50,7 +50,7 @@ export function CharacterContent({ data }: CharacterContentProps) {
         <>
           <CharacterEquipment armory={data.armory} />
           <GemsSection gems={data.gem} />
-          <StatsEngravingSection data={data} />
+          <StatsEngravingSection stats={data.stats} engraving={data.engraving} />
           <ArkPassiveSection arkPassive={data.arkPassive} />
           <ArkGridSection arkGrid={data.arkGrid} />
           <CardSection card={data.card} />

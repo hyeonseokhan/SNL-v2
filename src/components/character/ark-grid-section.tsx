@@ -8,26 +8,7 @@
 import Image from 'next/image'
 import type { ArkGridData } from '@/types/character'
 import { parseColoredText } from '@/lib/parse-colored-text'
-
-// ===================================================================
-// 헬퍼
-// ===================================================================
-
-/**
- * 섹션 라벨 — pill 배지 + 가로선
- *
- * @param children - 라벨 텍스트
- */
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mb-4 flex items-center gap-3">
-      <span className="shrink-0 rounded-full bg-primary/15 px-3 py-1 text-[12px] font-bold text-primary">
-        {children}
-      </span>
-      <div className="h-px flex-1 bg-black/10 dark:bg-white/15" />
-    </div>
-  )
-}
+import { SectionLabel } from './section-label'
 
 /**
  * 코어 옵션 HTML을 줄 단위로 분리하여 색상 적용된 React 노드로 변환합니다.
@@ -77,7 +58,6 @@ export function ArkGridSection({ arkGrid }: { arkGrid: ArkGridData }) {
         <div className="space-y-2.5 pl-3">
           {slots.length > 0 ? slots.map((slot, i) => (
             <div key={i} className="group/core relative flex items-center gap-2">
-              {/* 코어 아이콘 */}
               {slot.icon ? (
                 <div className="relative size-7 shrink-0 overflow-hidden rounded-md">
                   <Image src={slot.icon} alt={slot.name} fill className="object-contain" sizes="28px" unoptimized />
@@ -85,7 +65,6 @@ export function ArkGridSection({ arkGrid }: { arkGrid: ArkGridData }) {
               ) : (
                 <div className="size-7 shrink-0 rounded-md bg-black/10 dark:bg-white/10" />
               )}
-              {/* 코어명 + 포인트 배지 */}
               <span className={`text-[12px] font-medium ${CORE_GRADE[slot.grade]?.text ?? 'text-tx-body'}`}>
                 {slot.name}
               </span>
@@ -97,15 +76,12 @@ export function ArkGridSection({ arkGrid }: { arkGrid: ArkGridData }) {
               <div className="pointer-events-none absolute bottom-full left-0 z-50 mb-2 overflow-hidden rounded-lg border border-black/[0.08] bg-white opacity-0 shadow-2xl transition-opacity group-hover/core:opacity-100 dark:border-white/10 dark:bg-[#181b23]"
                 style={{ minWidth: 240, maxWidth: 340 }}
               >
-                {/* 코어명 (등급 색상) */}
                 <div className="px-3 py-2">
                   <p className={`text-[13px] font-bold ${CORE_GRADE[slot.grade]?.text ?? 'text-tx-body'}`}>
                     {slot.name}
                   </p>
                 </div>
-                {/* 구분선 */}
                 <div className="border-t border-black/[0.08] dark:border-white/[0.12]" />
-                {/* 등급 + 코어 타입 + 의지력 */}
                 <div className="space-y-1 px-3 py-2">
                   <p className="text-[11px] text-tx-label">
                     {slot.grade} 아크 그리드 코어
@@ -116,7 +92,6 @@ export function ArkGridSection({ arkGrid }: { arkGrid: ArkGridData }) {
                     </p>
                   )}
                 </div>
-                {/* 코어 옵션 */}
                 {slot.coreOptions && (
                   <>
                     <div className="border-t border-black/[0.08] dark:border-white/[0.12]" />
@@ -139,11 +114,9 @@ export function ArkGridSection({ arkGrid }: { arkGrid: ArkGridData }) {
         <div className="space-y-2.5 pl-3">
           {effects.length > 0 ? effects.map((eff, i) => (
             <div key={i}>
-              {/* 효과명 + 레벨 */}
               <p className="text-[13px] font-bold text-tx-body">
                 {eff.name} <span className="text-[11px] font-medium text-tx-label">Lv.{eff.level}</span>
               </p>
-              {/* 효과 수치 */}
               <p className="text-[11px] text-tx-label">
                 <span className="text-tx-caption">└</span> {parseColoredText(eff.description)}
               </p>
