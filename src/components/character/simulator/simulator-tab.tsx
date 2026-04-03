@@ -9,6 +9,7 @@
 
 import { useCharacterStore } from '@/stores/character-store'
 import { SimEngraving } from './sim-engraving'
+import { SimGem } from './sim-gem'
 
 /**
  * 시뮬레이터 탭
@@ -38,6 +39,7 @@ export function SimulatorTab() {
 
       {/* 수정 섹션 */}
       <SimEngraving />
+      <SimGem />
     </div>
   )
 }
