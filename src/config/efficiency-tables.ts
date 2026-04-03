@@ -11,7 +11,7 @@
 // ===================================================================
 
 /** 치명 → 치적 변환 상수 (27.94 치명 = 1% 치적) */
-export const CRIT_STAT_DIVISOR = 0.2794
+export const CRIT_STAT_DIVISOR = 27.94
 
 /** 특화 → 딜증 변환 상수 */
 export const SPEC_STAT_DIVISOR = 20.791
