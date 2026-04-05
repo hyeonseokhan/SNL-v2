@@ -71,7 +71,7 @@ interface ClassPassiveEffect {
 const CLASS_PASSIVE: Record<string, ClassPassiveEffect> = {
   '질풍노도': {
     critRate: (ms) => 10 + Math.floor(0.3 * Math.min(ms, 40) * 100) / 100,
-    critDmg: (ms) => Math.floor(1.2 * Math.min(ms, 40) * 100) / 100,
+    critDmg: (as) => Math.floor(1.2 * Math.min(as, 40) * 100) / 100,
     atkSpeed: 12,
     moveSpeed: 12,
   },
@@ -172,25 +172,32 @@ export function calculateEfficiency(
   }
   if (critFromEvolution) critBreakdown.push({ source: '진화', value: critFromEvolution })
 
-  // 2-5. 직업 각인 (질풍노도 등)
-  // LOPEC은 기본 14%를 제외한 순수 속도 증가분을 사용
+  // 2-5. 직업 각인 고유 치적 (질풍노도 등)
+  // 질풍노도 치적: 10% + floor(0.3 × min(이속증가, 40))
+  // 이속증가 = 전체 이동속도 - 기본 100% (기본 14% 포함)
+  // LOPEC 기준: 이속 53.83% → min(53.83, 40) = 40 → 10 + 12 = 22%
   if (classPassive) {
-    const moveSpeedForCalc = totalMoveSpeed - BASE_SPEED
-    const critFromClass = classPassive.critRate(moveSpeedForCalc)
+    const moveSpeedIncrease = totalMoveSpeed
+    const critFromClass = classPassive.critRate(moveSpeedIncrease)
     if (critFromClass) critBreakdown.push({ source: `직업 기본 (${data.profile.secondClass})`, value: critFromClass })
   }
 
-  // 2-6. 각인 치적
+  // 기민함 — 로스트빌드에서는 치적/치피에 기여하지만, LOPEC 효율표에서는 별도 계산
+  // 여기서는 찾아두고 치피 계산에서 사용
+  const allNodes = [
+    ...arkPassive.evolution.nodes,
+    ...arkPassive.enlightenment.nodes,
+    ...arkPassive.leap.nodes,
+  ]
+  const giminham = allNodes.find(n => n.name === '기민함')
+
+  // 2-7. 각인 치적
   const adrenaline = engraving.find(e => e.name === '아드레날린')
   if (adrenaline) {
     critBreakdown.push({ source: '아드레날린', value: 20 })
   }
 
-  // 2-7. 트라이포드 (급소 노출)
-  const hasWeakspot = data.skills.some(s => s.tripods.some(t => t.name === '급소 노출'))
-  if (hasWeakspot) {
-    critBreakdown.push({ source: '급소 노출', value: 10 })
-  }
+  // 급소 노출: 로스트빌드에서는 스킬별 딜 계산에 적용, LOPEC 효율표에서는 미포함
 
   const critRateTotal = critBreakdown.reduce((s, b) => s + b.value, 0)
 
@@ -208,11 +215,12 @@ export function calculateEfficiency(
   }
   if (critDmgFromAcc) critDmgBreakdown.push({ source: '악세 연마', value: critDmgFromAcc })
 
-  // 3-2. 직업 각인 치피 (질풍노도: 속도 기반)
-  if (classPassive) {
-    const moveSpeedForPassive = totalMoveSpeed - BASE_SPEED
-    const critDmgFromClass = classPassive.critDmg(moveSpeedForPassive)
-    if (critDmgFromClass) critDmgBreakdown.push({ source: `직업 기본 (${data.profile.secondClass})`, value: critDmgFromClass })
+  // 3-2. 기민함 치피 — 공속 기반
+  // 기민함 치피: min(공속증가, 40) × 40 × level / 10000 (%)
+  if (giminham) {
+    const cappedAtkSpeed = Math.min(totalAtkSpeed, 40)
+    const critDmgFromGiminham = cappedAtkSpeed * 40 * giminham.level / 10000 * 100
+    critDmgBreakdown.push({ source: '기민함 (치피)', value: critDmgFromGiminham })
   }
 
   // 3-3. 각인 치피

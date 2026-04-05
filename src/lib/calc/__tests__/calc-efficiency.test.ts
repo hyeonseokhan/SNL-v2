@@ -157,44 +157,42 @@ describe('변환 함수', () => {
   })
 })
 
-describe('리얼본좌강림 (기상술사) — LOPEC 값 검증', () => {
+describe('리얼본좌강림 (기상술사) — LOPEC/로스트빌드 값 검증', () => {
   const fixture = createFixture()
+
+  // LOPEC 효율표 기준 (도핑 없음)
   const metrics = calculateEfficiency(fixture)
 
-  it('전체 결과 출력', () => {
-    printMetrics('리얼본좌강림 — 버프 없음', metrics)
+  it('전체 결과 출력 (도핑 없음)', () => {
+    printMetrics('리얼본좌강림 — 도핑 없음', metrics)
+  })
+
+  it('공격 속도 = 43.83%', () => {
+    // 기본14 + 신속27.83 + 질풍노도12 - 질량증가10 = 43.83
+    expect(metrics.attackSpeed.total).toBeCloseTo(43.83, 1)
+  })
+
+  it('이동 속도 = 53.83%', () => {
+    // 기본14 + 신속27.83 + 질풍노도12 = 53.83
+    expect(metrics.moveSpeed.total).toBeCloseTo(53.83, 1)
   })
 
   it('치명타 적중률 = 97.15%', () => {
-    // LOPEC 값: 97.15%
-    // 특성 31.85 + 악세 3.10 + 팔찌 4.20 + 진화 16.00 + 직업 22.00 + 아드레날린 20.00
+    // LOPEC breakdown:
+    // 스탯31.85 + 악세3.10 + 팔찌4.20 + 진화16.00 + 직업22.00 + 아드레날린20.00 = 97.15
+    // 질풍노도 22% = 10% 기본 + floor(0.3 × min(53.83, 40)) = 10 + 12 = 22
+    // 기민함 12%는 LOPEC에서 "직업 기본 22%"에 포함되지 않고 별도?
+    // → 실제: 31.85 + 3.10 + 4.20 + 16.00 + 22.00 + 20.00 = 97.15
+    // → 기민함은 LOPEC breakdown에 포함되지 않음 (질풍노도 속도보너스가 기민함 역할)
     expect(metrics.critRate.total).toBeCloseTo(97.15, 0)
   })
 
   it('치명타 피해량 = 250.20%', () => {
-    // LOPEC 값: 250.20%
-    // 기본 200 + 악세 2.20 + 직업(질풍노도) 48.00
+    // 기본200 + 악세2.20 + 기민함(치피)48.00 = 250.20
     expect(metrics.critDamage.total).toBeCloseTo(250.20, 0)
   })
 
-  it('공격 속도 = 43.83%', () => {
-    // LOPEC 값: 43.83%
-    // 기본 14 + 신속 27.83 + 질풍노도 12 - 질량증가 10
-    expect(metrics.attackSpeed.total).toBeCloseTo(43.83, 0)
-  })
-
-  it('이동 속도 = 53.83%', () => {
-    // LOPEC 값: 53.83%
-    // 기본 14 + 신속 27.83 + 질풍노도 12
-    expect(metrics.moveSpeed.total).toBeCloseTo(53.83, 0)
-  })
-
   it('메인노드 효율: 음속 돌파 Lv.2 = 21.29%', () => {
-    // LOPEC 값: 21.29%
-    // i = min(43.83,40)*0.1 + min(53.83,40)*0.1 = 8.0
-    // o = max(0,3.83)*0.3 + max(0,13.83)*0.3 = 5.298
-    // bonus = 8 (양쪽 40 초과)
-    // total = min(21.298, 24) = 21.29
     expect(metrics.mainNodeEfficiency.total).toBeCloseTo(21.29, 1)
   })
 
