@@ -235,15 +235,72 @@ export function calculateEfficiency(
 
   const critDmgTotal = critDmgBreakdown.reduce((s, b) => s + b.value, 0)
 
-  // ─── 4. 팔찌 효율 (간이) ───
+  // ─── 4. 팔찌 효율 (전투력 계수 기반) ───
+  // 팔찌 옵션을 bracelet_addontype_attack / bracelet_stattype 포인트로 변환
+  // 각 포인트 → multiplier = point / 10000 + 1, 곱연산
   const bangleBreakdown: BreakdownItem[] = []
+  let bangleProduct = 1
+
+  // 팔찌 특수효과 포인트 매핑 (bracelet_addontype_attack에서 추출)
+  const BANGLE_ADDON_PATTERNS: [RegExp, number][] = [
+    [/추가\s*피해가?\s*(\d+\.?\d+)%.*악마/, 450],   // 추피+악마 (3.5%/2.5%)
+    [/추가\s*피해가?\s*(\d+\.?\d+)%/, 350],          // 추피 단독
+    [/치명타\s*적중률[이가]?\s*(\d+\.?\d+)%.*치명타.*피해가?\s*(\d+\.?\d+)%/, 400], // 치적+치주피
+    [/적에게\s*주는\s*피해가?\s*(\d+\.?\d+)%/, 300],  // 적주피
+  ]
+
+  // 팔찌 스탯 포인트 계수 (bracelet_stattype)
+  const BANGLE_STAT_COEFF: Record<string, number> = {
+    '치명': 7000,   // critRate 계수
+    '특화': 5000,
+    '신속': 5000,
+  }
+
   for (const opt of armory.accessory.bangle.option) {
-    const numMatch = opt.match(/(\d+\.?\d+)%/)
-    if (numMatch) {
-      bangleBreakdown.push({ source: opt, value: parseFloat(numMatch[1]) })
+    // 스탯 옵션 (치명 +117, 신속 +83 등)
+    const statMatch = opt.match(/^(치명|특화|신속|제압|인내|숙련)\s*\+(\d+)$/)
+    if (statMatch) {
+      const statName = statMatch[1]
+      const statValue = parseInt(statMatch[2])
+      const coeff = BANGLE_STAT_COEFF[statName]
+      if (coeff) {
+        // 스탯 → 전투력 변화 비율 근사
+        // 치명: 117 / 27.94 = 4.19% 치적 → 전투력 기여 ~3.25%
+        // 신속: 83 / 58.23 = 1.43% 속도 → 돌격대장 연동 등 ~2.83%
+        let contribution = 0
+        if (statName === '치명') {
+          contribution = statValue / 27.94 * 0.78 // 치적→딜증 변환 계수
+        } else if (statName === '신속') {
+          contribution = statValue / 58.23 * 1.98 // 속도→딜증 변환 (돌격대장 등 연동)
+        } else {
+          contribution = statValue * coeff / 10000000
+        }
+        bangleBreakdown.push({ source: opt, value: contribution })
+        bangleProduct *= (1 + contribution / 100)
+      }
+      continue
+    }
+
+    // 특수효과 옵션
+    let matched = false
+    for (const [pattern, point] of BANGLE_ADDON_PATTERNS) {
+      if (pattern.test(opt)) {
+        const mult = point / 10000
+        bangleBreakdown.push({ source: opt, value: mult * 100 })
+        bangleProduct *= (1 + mult)
+        matched = true
+        break
+      }
+    }
+    if (!matched) {
+      // 매칭 안 되는 옵션은 퍼센트 추출 시도
+      const pctMatch = opt.match(/(\d+\.?\d+)%/)
+      if (pctMatch) {
+        bangleBreakdown.push({ source: opt, value: parseFloat(pctMatch[1]) })
+      }
     }
   }
-  const bangleTotal = bangleBreakdown.reduce((s, b) => s + b.value, 0)
+  const bangleTotal = (bangleProduct - 1) * 100
 
   // ─── 5. 각인 총합 효율 (곱연산) ───
   // LOPEC ABILITY_ATTACK 테이블 직접 조회

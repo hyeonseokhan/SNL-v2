@@ -63,7 +63,7 @@ function createFixture(): CharData {
         earing2: { name: '', icon: '', grade: '', quality: 91, tier: 4, enlightenment: 0, option: ['공격력 +1.55%', '무기 공격력 +0.80%', '상태이상 공격 지속시간 +1.00%'], tooltipRaw: '' },
         ring1: { name: '', icon: '', grade: '', quality: 91, tier: 4, enlightenment: 0, option: ['치명타 적중률 +1.55%', '치명타 피해 +1.10%', '무기 공격력 +195'], tooltipRaw: '' },
         ring2: { name: '', icon: '', grade: '', quality: 95, tier: 4, enlightenment: 0, option: ['치명타 적중률 +1.55%', '치명타 피해 +1.10%', '무기 공격력 +195'], tooltipRaw: '' },
-        bangle: { name: '', icon: '', grade: '', quality: 0, tier: 4, enlightenment: 0, option: ['신속 +83', '치명 +117', '추가 피해가 3.5% 증가한다.', '치명타 적중률이 4.2% 증가한다.'], tooltipRaw: '' },
+        bangle: { name: '', icon: '', grade: '', quality: 0, tier: 4, enlightenment: 0, option: ['신속 +83', '치명 +117', '추가 피해가 3.5% 증가한다. 악마 및 대악마 계열 피해량이 2.5% 증가한다.', '치명타 적중률이 4.2% 증가한다. 공격이 치명타로 적중 시 적에게 주는 피해가 1.5% 증가한다.'], tooltipRaw: '' },
         stone: { name: '', icon: '', grade: '', tooltipRaw: '', option: [], engravings: [], levelBonus: '' },
         compass: { name: '', icon: '', grade: '', tooltipRaw: '' },
         charm: { name: '', icon: '', grade: '', tooltipRaw: '' },
