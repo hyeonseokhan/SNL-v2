@@ -220,3 +220,106 @@ describe('리얼본좌강림 (기상술사) — LOPEC/로스트빌드 값 검증
     expect(after.critDamage.total).toBeCloseTo(before.critDamage.total + 50, 0)
   })
 })
+
+// ===================================================================
+// 리얼막내강림 (발키리/빛의기사) — 치명 빌드
+// ===================================================================
+
+function createValkyrieFixture(): CharData {
+  return {
+    profile: { class: '발키리', secondClass: '빛의 기사', itemLevel: 1720, characterName: '리얼막내강림', serverName: '아브렐슈드', characterLevel: 70, guildName: '', title: '', titleIcon: '', characterImage: null, expeditionLevel: 0, pvpGrade: '', townLevel: 0, townName: '' },
+    stats: { critical: 1762, haste: 627, special: 75, suppress: 0, patience: 0, expert: 0, combatPower: 0, attack: 0, maxHp: 0 },
+    engraving: [
+      { name: '원한', level: 3, grade: '유물', stoneLevel: 3, description: '', icon: '' },
+      { name: '예리한 둔기', level: 0, grade: '유물', stoneLevel: 0, description: '', icon: '' },
+      { name: '아드레날린', level: 4, grade: '유물', stoneLevel: 2, description: '', icon: '' },
+      { name: '돌격대장', level: 4, grade: '유물', stoneLevel: 0, description: '', icon: '' },
+      { name: '타격의 대가', level: 4, grade: '유물', stoneLevel: 0, description: '', icon: '' },
+    ],
+    armory: { equipList: [], equipment: { weapon: { name:'',refine:0,quality:0,itemLevel:0,icon:'',grade:'',tier:0,tooltipRaw:'' } }, accessory: { necklace:{name:'',icon:'',grade:'',quality:0,tier:4,enlightenment:0,option:[],tooltipRaw:''}, earing1:{name:'',icon:'',grade:'',quality:0,tier:4,enlightenment:0,option:[],tooltipRaw:''}, earing2:{name:'',icon:'',grade:'',quality:0,tier:4,enlightenment:0,option:[],tooltipRaw:''}, ring1:{name:'',icon:'',grade:'',quality:0,tier:4,enlightenment:0,option:[],tooltipRaw:''}, ring2:{name:'',icon:'',grade:'',quality:0,tier:4,enlightenment:0,option:[],tooltipRaw:''}, bangle:{name:'',icon:'',grade:'',quality:0,tier:4,enlightenment:0,option:[],tooltipRaw:''}, stone:{name:'',icon:'',grade:'',tooltipRaw:'',option:[],engravings:[],levelBonus:''}, compass:{name:'',icon:'',grade:'',tooltipRaw:''}, charm:{name:'',icon:'',grade:'',tooltipRaw:''}, orb:{name:'',icon:'',grade:'',tooltipRaw:'',paradisePower:0} } },
+    arkPassive: {
+      evolution: { points: 140, karmaRank: 6, karmaLevel: 25, nodes: [
+        { name: '입식 타격가', level: 2, tier: 5, icon: '', tooltip: '' },
+      ] },
+      enlightenment: { points: 101, karmaRank: 6, karmaLevel: 25, nodes: [
+        { name: '빛의 기사', level: 3, tier: 1, icon: '', tooltip: '' },
+      ] },
+      leap: { points: 70, karmaRank: 6, karmaLevel: 25, nodes: [] },
+    },
+    gem: [], card: { cards: [], setName: '', setSummary: '', setEffects: [] }, arkGrid: { slots: [], effects: [] }, skills: [], uniqueKey: '리얼막내강림',
+  }
+}
+
+describe('리얼막내강림 (발키리) — LOPEC 비교', () => {
+  const fixture = createValkyrieFixture()
+  const metrics = calculateEfficiency(fixture)
+
+  it('결과 출력', () => {
+    printMetrics('리얼막내강림 (발키리)', metrics)
+    console.log('\nLOPEC 비교:')
+    console.log('  치적: 우리', metrics.critRate.total.toFixed(2) + '% vs LOPEC 99.96%')
+    console.log('  치피: 우리', metrics.critDamage.total.toFixed(2) + '% vs LOPEC 255.60%')
+    console.log('  공속: 우리', metrics.attackSpeed.total.toFixed(2) + '% vs LOPEC 24.77%')
+    console.log('  이속: 우리', metrics.moveSpeed.total.toFixed(2) + '% vs LOPEC 54.77%')
+  })
+
+  it('공속 = 24.77%', () => {
+    // 기본14 + 신속10.77 + 빛의기사0 - 질량증가0 = 24.77
+    expect(metrics.attackSpeed.total).toBeCloseTo(24.77, 0)
+  })
+
+  it('이속 = 54.77%', () => {
+    // 기본14 + 신속10.77 + 빛의기사30(?) = 54.77
+    // 빛의기사 이속 +30%?
+    expect(metrics.moveSpeed.total).toBeCloseTo(54.77, 0)
+  })
+})
+
+// ===================================================================
+// 9X1214 (아르카나/황제의칙령) — 신속 빌드
+// ===================================================================
+
+function createArcanaFixture(): CharData {
+  return {
+    profile: { class: '아르카나', secondClass: '황제의 칙령', itemLevel: 1770, characterName: '9X1214', serverName: '', characterLevel: 70, guildName: '', title: '', titleIcon: '', characterImage: null, expeditionLevel: 0, pvpGrade: '', townLevel: 0, townName: '' },
+    stats: { critical: 678, haste: 1825, special: 75, suppress: 0, patience: 0, expert: 0, combatPower: 0, attack: 0, maxHp: 0 },
+    engraving: [
+      { name: '원한', level: 1, grade: '유물', stoneLevel: 0, description: '', icon: '' },
+      { name: '아드레날린', level: 3, grade: '유물', stoneLevel: 3, description: '', icon: '' },
+      { name: '질량 증가', level: 4, grade: '유물', stoneLevel: 0, description: '', icon: '' },
+      { name: '저주받은 인형', level: 4, grade: '유물', stoneLevel: 0, description: '', icon: '' },
+      { name: '돌격대장', level: 0, grade: '유물', stoneLevel: 2, description: '', icon: '' },
+    ],
+    armory: { equipList: [], equipment: { weapon: { name:'',refine:0,quality:0,itemLevel:0,icon:'',grade:'',tier:0,tooltipRaw:'' } }, accessory: { necklace:{name:'',icon:'',grade:'',quality:0,tier:4,enlightenment:0,option:[],tooltipRaw:''}, earing1:{name:'',icon:'',grade:'',quality:0,tier:4,enlightenment:0,option:[],tooltipRaw:''}, earing2:{name:'',icon:'',grade:'',quality:0,tier:4,enlightenment:0,option:[],tooltipRaw:''}, ring1:{name:'',icon:'',grade:'',quality:0,tier:4,enlightenment:0,option:[],tooltipRaw:''}, ring2:{name:'',icon:'',grade:'',quality:0,tier:4,enlightenment:0,option:[],tooltipRaw:''}, bangle:{name:'',icon:'',grade:'',quality:0,tier:4,enlightenment:0,option:[],tooltipRaw:''}, stone:{name:'',icon:'',grade:'',tooltipRaw:'',option:[],engravings:[],levelBonus:''}, compass:{name:'',icon:'',grade:'',tooltipRaw:''}, charm:{name:'',icon:'',grade:'',tooltipRaw:''}, orb:{name:'',icon:'',grade:'',tooltipRaw:'',paradisePower:0} } },
+    arkPassive: {
+      evolution: { points: 140, karmaRank: 6, karmaLevel: 25, nodes: [
+        { name: '뭉툭한 가시', level: 2, tier: 5, icon: '', tooltip: '' },
+      ] },
+      enlightenment: { points: 101, karmaRank: 6, karmaLevel: 26, nodes: [
+        { name: '황제의 칙령', level: 3, tier: 1, icon: '', tooltip: '' },
+      ] },
+      leap: { points: 70, karmaRank: 6, karmaLevel: 25, nodes: [] },
+    },
+    gem: [], card: { cards: [], setName: '', setSummary: '', setEffects: [] }, arkGrid: { slots: [], effects: [] }, skills: [], uniqueKey: '9X1214',
+  }
+}
+
+describe('9X1214 (아르카나) — LOPEC 비교', () => {
+  const fixture = createArcanaFixture()
+  const metrics = calculateEfficiency(fixture)
+
+  it('결과 출력', () => {
+    printMetrics('9X1214 (아르카나)', metrics)
+    console.log('\nLOPEC 비교:')
+    console.log('  치적: 우리', metrics.critRate.total.toFixed(2) + '% vs LOPEC 55.86%')
+    console.log('  치피: 우리', metrics.critDamage.total.toFixed(2) + '% vs LOPEC 209.00%')
+    console.log('  공속: 우리', metrics.attackSpeed.total.toFixed(2) + '% vs LOPEC 41.35%')
+    console.log('  이속: 우리', metrics.moveSpeed.total.toFixed(2) + '% vs LOPEC 51.35%')
+  })
+
+  it('공속 검증 (악세/팔찌/노드 데이터 미포함 상태)', () => {
+    // 기본14 + 신속31.35 - 질량증가10 = 35.35
+    // LOPEC 41.35와 차이 6%: 악세/팔찌/깨달음 노드 속도 보너스 미포함
+    expect(metrics.attackSpeed.total).toBeCloseTo(35.35, 0)
+  })
+})

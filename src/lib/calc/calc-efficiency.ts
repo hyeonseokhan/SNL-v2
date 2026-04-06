@@ -56,36 +56,113 @@ export function hasteStatToSpeed(hasteStat: number): number {
 // ===================================================================
 
 /**
- * 질풍노도 (기상술사)
- * - 치적: 10% + floor(0.3 × min(이동속도, 40) × 100) / 100
- * - 치피: floor(1.2 × min(이동속도, 40) × 100) / 100
- * - 공이속: +12%
+ * 직업 각인 패시브 효과
+ *
+ * LOPEC Module 49295에서 추출한 전체 54개 직업 각인 데이터.
+ * critRate/critDmg: 고정값 또는 속도 기반 계산 함수
+ * atkSpeed/moveSpeed: 고정 % 보너스
  */
 interface ClassPassiveEffect {
-  critRate: (moveSpeed: number) => number
-  critDmg: (moveSpeed: number) => number
+  critRate: number | ((moveSpeed: number) => number)
+  critDmg: number | ((atkSpeed: number) => number)
   atkSpeed: number
   moveSpeed: number
 }
 
+/** LOPEC 기준 전체 직업 각인 패시브 테이블 */
 const CLASS_PASSIVE: Record<string, ClassPassiveEffect> = {
-  '질풍노도': {
+  // ── 워리어 계열 ──
+  '고독한 기사':     { critRate: 15, critDmg: 45, atkSpeed: 0, moveSpeed: 0 },
+  '전투 태세':       { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '광기':           { critRate: 30, critDmg: 0, atkSpeed: 15, moveSpeed: 15 },
+  '광전사의 비기':   { critRate: 30, critDmg: 0, atkSpeed: 20, moveSpeed: 20 },
+  '분노의 망치':     { critRate: 18, critDmg: 51, atkSpeed: 0, moveSpeed: 0 },
+  '중력 수련':       { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '처단자':         { critRate: 30, critDmg: 0, atkSpeed: 20, moveSpeed: 20 },
+  '포식자':         { critRate: 30, critDmg: 51, atkSpeed: 20, moveSpeed: 20 },
+  '심판자':         { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 15 },
+  '빛의 기사':       { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 30 },
+
+  // ── 무도가 계열 ──
+  '충격 단련':       { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '극의: 체술':      { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '오의 강화':       { critRate: 30, critDmg: 0, atkSpeed: 8, moveSpeed: 16 },
+  '초심':           { critRate: 30, critDmg: 0, atkSpeed: 8, moveSpeed: 16 },
+  '역천지체':       { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '세맥타통':       { critRate: 0, critDmg: 75, atkSpeed: 0, moveSpeed: 0 },
+  '절제':           { critRate: 20, critDmg: 70, atkSpeed: 0, moveSpeed: 0 },
+  '절정':           { critRate: 20, critDmg: 70, atkSpeed: 15, moveSpeed: 15 },
+  '일격필살':       { critRate: 20, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '오의난무':       { critRate: 20, critDmg: 0, atkSpeed: 8, moveSpeed: 0 },
+  '권왕파천무':     { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '수라의 길':       { critRate: 0, critDmg: 0, atkSpeed: 15, moveSpeed: 15 },
+
+  // ── 헌터 계열 ──
+  '전술 탄환':       { critRate: 34, critDmg: 14, atkSpeed: 0, moveSpeed: 0 },
+  '핸드거너':       { critRate: 10, critDmg: 0, atkSpeed: 8, moveSpeed: 8 },
+  '두 번째 동료':    { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 8 },
+  '죽음의 습격':     { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '포격 강화':       { critRate: 40, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '화력 강화':       { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '아르데타인의 기술': { critRate: 9, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '진화의 유산':     { critRate: 0, critDmg: 0, atkSpeed: 15, moveSpeed: 30 },
+  '피스메이커':      { critRate: 25, critDmg: 0, atkSpeed: 16, moveSpeed: 0 },
+  '사냥의 시간':     { critRate: 55, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+
+  // ── 마법사 계열 ──
+  '황후의 은총':     { critRate: 10, critDmg: 0, atkSpeed: 19.2, moveSpeed: 30 },
+  '황제의 칙령':     { critRate: 10, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '넘치는 교감':     { critRate: 11.8, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '상급 소환사':     { critRate: 27.8, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '진실된 용맹':     { critRate: 30, critDmg: 0, atkSpeed: 8, moveSpeed: 0 },
+  '점화':           { critRate: 30, critDmg: 55, atkSpeed: 0, moveSpeed: 0 },
+  '환류':           { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+
+  // ── 암살자 계열 ──
+  '버스트':         { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 22.8 },
+  '잔재된 기운':     { critRate: 0, critDmg: 0, atkSpeed: 24.8, moveSpeed: 24.8 },
+  '멈출 수 없는 충동': { critRate: 30, critDmg: 0, atkSpeed: 0, moveSpeed: 20 },
+  '완벽한 억제':     { critRate: 10, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '달의 소리':       { critRate: 10, critDmg: 0, atkSpeed: 10, moveSpeed: 10 },
+  '갈증':           { critRate: 23, critDmg: 0, atkSpeed: 10, moveSpeed: 10 },
+  '만월의 집행자':   { critRate: 34, critDmg: 0, atkSpeed: 0, moveSpeed: 39.2 },
+  '그믐의 경계':     { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 19.2 },
+
+  // ── 스페셜리스트 계열 ──
+  '회귀':           { critRate: 25, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  // 질풍노도는 속도 기반 특수 계산
+  '질풍노도':       {
     critRate: (ms) => 10 + Math.floor(0.3 * Math.min(ms, 40) * 100) / 100,
     critDmg: (as) => Math.floor(1.2 * Math.min(as, 40) * 100) / 100,
     atkSpeed: 12,
     moveSpeed: 12,
   },
-  '수라의 길': {
-    critRate: () => 0,
-    critDmg: () => 0,
-    atkSpeed: 15,
-    moveSpeed: 15,
-  },
+  '이슬비':         { critRate: 10, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '야성':           { critRate: 30, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '환수 각성':       { critRate: 0, critDmg: 60, atkSpeed: 20, moveSpeed: 20 },
+  '업화의 계승자':   { critRate: 20, critDmg: 0, atkSpeed: 15, moveSpeed: 15 },
+  '드레드 로어':     { critRate: 15, critDmg: 0, atkSpeed: 15, moveSpeed: 0 },
+
+  // ── 서포트 (전투 스탯 없음) ──
+  '절실한 구원':     { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '축복의 오라':     { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '만개':           { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  '해방자':         { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
 }
 
 /** 캐릭터 secondClass(직업 각인)에서 패시브 효과 조회 */
 function getClassPassive(secondClass: string): ClassPassiveEffect | null {
   return CLASS_PASSIVE[secondClass] ?? null
+}
+
+/** 직업 각인의 치적 값 계산 (고정값 또는 함수) */
+function resolvePassiveCritRate(passive: ClassPassiveEffect, moveSpeed: number): number {
+  return typeof passive.critRate === 'function' ? passive.critRate(moveSpeed) : passive.critRate
+}
+
+/** 직업 각인의 치피 값 계산 (고정값 또는 함수) */
+function resolvePassiveCritDmg(passive: ClassPassiveEffect, atkSpeed: number): number {
+  return typeof passive.critDmg === 'function' ? passive.critDmg(atkSpeed) : passive.critDmg
 }
 
 // ===================================================================
@@ -178,7 +255,7 @@ export function calculateEfficiency(
   // LOPEC 기준: 이속 53.83% → min(53.83, 40) = 40 → 10 + 12 = 22%
   if (classPassive) {
     const moveSpeedIncrease = totalMoveSpeed
-    const critFromClass = classPassive.critRate(moveSpeedIncrease)
+    const critFromClass = resolvePassiveCritRate(classPassive, moveSpeedIncrease)
     if (critFromClass) critBreakdown.push({ source: `직업 기본 (${data.profile.secondClass})`, value: critFromClass })
   }
 
@@ -223,7 +300,16 @@ export function calculateEfficiency(
     critDmgBreakdown.push({ source: '기민함 (치피)', value: critDmgFromGiminham })
   }
 
-  // 3-3. 각인 치피
+  // 3-3. 직업 각인 고정 치피 (질풍노도 제외 — 기민함에서 처리)
+  if (classPassive) {
+    const critDmgFromClass = resolvePassiveCritDmg(classPassive, totalAtkSpeed)
+    // 질풍노도는 기민함에서 이미 처리하므로 중복 방지
+    if (critDmgFromClass && data.profile.secondClass !== '질풍노도') {
+      critDmgBreakdown.push({ source: `직업 (${data.profile.secondClass})`, value: critDmgFromClass })
+    }
+  }
+
+  // 3-4. 각인 치피
   const keenBlunt = engraving.find(e => e.name === '예리한 둔기')
   if (keenBlunt) {
     critDmgBreakdown.push({ source: '예리한 둔기', value: 50 })
