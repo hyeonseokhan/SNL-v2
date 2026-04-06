@@ -6,7 +6,7 @@
  */
 
 import type { CharData } from '@/types/character'
-import { ENGRAVING_EFFICIENCY } from '@/config/efficiency-tables'
+import { ABILITY_ATTACK, GRADE_OFFSET } from '@/config/efficiency-tables'
 
 // ===================================================================
 // 타입
@@ -246,18 +246,23 @@ export function calculateEfficiency(
   const bangleTotal = bangleBreakdown.reduce((s, b) => s + b.value, 0)
 
   // ─── 5. 각인 총합 효율 (곱연산) ───
+  // LOPEC ABILITY_ATTACK 테이블 직접 조회
+  // key = 20 × stoneLevel + engravingLevel + gradeOffset (유물=9, 전설=5)
+  // value = point → multiplier = point / 10000 + 1
   const engBreakdown: BreakdownItem[] = []
   let engProduct = 1
   for (const eng of engraving) {
-    const eff = ENGRAVING_EFFICIENCY[eng.name]
-    if (eff) {
-      // 스톤 레벨에 따른 보간 (lv0 ~ lv4)
-      const ratio = eng.stoneLevel / 4
-      const value = eff.lv0 + (eff.lv4 - eff.lv0) * ratio
-      const multiplier = value / 100
-      engBreakdown.push({ source: `${eng.name} x${eng.level}`, value: multiplier * 100 })
-      engProduct *= (1 + multiplier)
-    }
+    const table = ABILITY_ATTACK[eng.name]
+    if (!table) continue
+
+    const gradeOffset = GRADE_OFFSET[eng.grade as keyof typeof GRADE_OFFSET] ?? 9
+    const key = String(20 * eng.stoneLevel + eng.level + gradeOffset)
+    const point = table[key]
+    if (point === undefined) continue
+
+    const multiplier = point / 10000
+    engBreakdown.push({ source: `${eng.name} x${eng.level}`, value: multiplier * 100 })
+    engProduct *= (1 + multiplier)
   }
   const engTotal = (engProduct - 1) * 100
 
