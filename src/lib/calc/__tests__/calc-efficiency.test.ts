@@ -269,9 +269,12 @@ describe('리얼막내강림 (발키리) — LOPEC 비교', () => {
   })
 
   it('이속 = 54.77%', () => {
-    // 기본14 + 신속10.77 + 빛의기사30(?) = 54.77
-    // 빛의기사 이속 +30%?
     expect(metrics.moveSpeed.total).toBeCloseTo(54.77, 0)
+  })
+
+  it('메인노드: 입식 타격가 Lv.2 = 21%', () => {
+    // 발키리 입식 타격가는 고정값
+    expect(metrics.mainNodeEfficiency.total).toBeCloseTo(21, 1)
   })
 })
 

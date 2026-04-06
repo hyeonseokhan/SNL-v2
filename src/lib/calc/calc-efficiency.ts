@@ -410,24 +410,44 @@ export function calculateEfficiency(
   const engTotal = (engProduct - 1) * 100
 
   // ─── 6. 메인노드 효율 ───
+  // 지원 클래스: 기상술사(음속 돌파), 발키리(입식 타격가), 브레이커(인파이팅)
   const mainNode = arkPassive.evolution.nodes.find(n => n.tier === 5)
   const mainNodeBreakdown: BreakdownItem[] = []
   let mainNodeTotal = 0
 
-  if (mainNode?.name === '음속 돌파') {
-    // LOPEC 공식: i = min(공속,40)*0.1 + min(이속,40)*0.1
-    //            o = max(0,공속-40)*0.3 + max(0,이속-40)*0.3
-    //            bonus = 양쪽 40 초과 시 +8
-    //            total = min(i + bonus + o, 12 * level)
-    const as = totalAtkSpeed
-    const ms = totalMoveSpeed
-    const i = Math.min(as, 40) * 0.1 + Math.min(ms, 40) * 0.1
-    const o = Math.max(0, as - 40) * 0.3 + Math.max(0, ms - 40) * 0.3
-    const bonus = (as > 40 && ms > 40) ? 8 : 0
-    const cap = 12 * mainNode.level
-    mainNodeTotal = Math.min(Math.floor((i + bonus + o) * 100) / 100, cap)
-    mainNodeBreakdown.push({ source: `${mainNode.name} Lv.${mainNode.level}`, value: mainNodeTotal })
-    mainNodeBreakdown.push({ source: '상한', value: cap })
+  if (mainNode) {
+    const lv = mainNode.level
+
+    if (mainNode.name === '음속 돌파') {
+      // LOPEC 공식 (Lv별 계수 다름):
+      // Lv1: under=0.05, both bonus=4,  over=0.15, cap=12
+      // Lv2: under=0.10, both bonus=8,  over=0.30, cap=24
+      const params = lv === 1
+        ? { under: 0.05, both: 4, over: 0.15, cap: 12 }
+        : { under: 0.10, both: 8, over: 0.30, cap: 24 }
+      const as = totalAtkSpeed
+      const ms = totalMoveSpeed
+      const i = Math.min(as, 40) * params.under + Math.min(ms, 40) * params.under
+      const o = Math.max(0, as - 40) * params.over + Math.max(0, ms - 40) * params.over
+      const bonus = (as > 40 && ms > 40) ? params.both : 0
+      mainNodeTotal = Math.min(Math.floor((i + bonus + o) * 100) / 100, params.cap)
+      mainNodeBreakdown.push({ source: `${mainNode.name} Lv.${lv}`, value: mainNodeTotal })
+      mainNodeBreakdown.push({ source: '상한', value: params.cap })
+    } else if (mainNode.name === '입식 타격가') {
+      // 발키리: 고정값
+      const cap = lv === 1 ? 10.5 : 21
+      mainNodeTotal = cap
+      mainNodeBreakdown.push({ source: `${mainNode.name} Lv.${lv}`, value: cap })
+      mainNodeBreakdown.push({ source: '상한', value: cap })
+    } else if (mainNode.name === '인파이팅') {
+      // 브레이커: 고정값
+      const cap = lv === 1 ? 9 : 18
+      mainNodeTotal = cap
+      mainNodeBreakdown.push({ source: `${mainNode.name} Lv.${lv}`, value: cap })
+      mainNodeBreakdown.push({ source: '상한', value: cap })
+    } else {
+      mainNodeBreakdown.push({ source: `${mainNode.name} (지원 안 함)`, value: 0 })
+    }
   }
 
   // ─── 결과 ───
