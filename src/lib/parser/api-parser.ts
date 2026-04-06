@@ -557,6 +557,12 @@ export function parseApiResponse(apiData: any): CharData {
   const { arkGrid } = parseArkGrid(apiData.ArkGrid)
   const { skills } = parseSkills(apiData.ArmorySkills)
 
+  // 직업 각인(secondClass)은 깨달음 1티어 첫 번째 노드에서 추출
+  const tier1Enlightenment = arkPassive.enlightenment.nodes.find((n) => n.tier === 1)
+  if (tier1Enlightenment?.name) {
+    profile.secondClass = tier1Enlightenment.name
+  }
+
   return {
     profile,
     stats,

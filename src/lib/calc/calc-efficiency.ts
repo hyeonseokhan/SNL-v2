@@ -445,6 +445,17 @@ export function calculateEfficiency(
       mainNodeTotal = cap
       mainNodeBreakdown.push({ source: `${mainNode.name} Lv.${lv}`, value: cap })
       mainNodeBreakdown.push({ source: '상한', value: cap })
+    } else if (mainNode.name === '뭉툭한 가시') {
+      // 아르카나/브레이커: 치적 80% 캡 + 초과분 진피
+      // Lv1: base=7.5, overflow=1.25, cap=52.5
+      // Lv2: base=15.0, overflow=1.5, cap=75
+      const params = lv === 1
+        ? { base: 7.5, overflow: 1.25, cap: 52.5 }
+        : { base: 15.0, overflow: 1.5, cap: 75 }
+      const overflow = Math.max(0, critRateTotal - 80) * params.overflow
+      mainNodeTotal = Math.min(params.base + overflow, params.cap)
+      mainNodeBreakdown.push({ source: `${mainNode.name} Lv.${lv}`, value: mainNodeTotal })
+      mainNodeBreakdown.push({ source: '상한', value: params.cap })
     } else {
       mainNodeBreakdown.push({ source: `${mainNode.name} (지원 안 함)`, value: 0 })
     }
