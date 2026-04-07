@@ -1,12 +1,27 @@
 /**
- * @file 효율 분석 계산 엔진
+ * @file 효율 분석 계산 엔진 (순수 알고리즘)
  *
  * CharData를 입력받아 6가지 효율 지표를 계산합니다.
  * LOPEC (lopec.kr) 계산 로직 기반.
+ *
+ * **데이터와 알고리즘 분리 원칙**:
+ * - 게임 데이터(상수, 테이블)는 src/config/tables/ 하위에서 관리
+ * - 게임 변환 공식은 src/config/constants/에서 관리
+ * - 이 파일은 순수 알고리즘만 포함 (밸런스 패치 시 수정 불필요)
+ *
+ * @see docs/AI-PATCH-GUIDE.md
  */
 
 import type { CharData } from '@/types/character'
-import { ABILITY_ATTACK, GRADE_OFFSET } from '@/config/efficiency-tables'
+import { ABILITY_ATTACK, GRADE_OFFSET } from '@/config/tables/engravings'
+import { CRIT_STAT_DIVISOR, HASTE_STAT_DIVISOR, BASE_SPEED } from '@/config/constants/stat-conversion'
+import {
+  CLASS_PASSIVES,
+  resolvePassiveCritRate,
+  resolvePassiveCritDmg,
+  type ClassPassiveEffect,
+} from '@/config/tables/class-passives'
+import { MAIN_NODE_DEFS } from '@/config/tables/main-nodes'
 
 // ===================================================================
 // 타입
@@ -38,131 +53,22 @@ export interface BuffOptions {
 }
 
 // ===================================================================
-// 변환 함수
+// 변환 함수 (스탯 → 효율 %)
 // ===================================================================
 
 /** 치명 스탯 → 치적% (LOPEC: floor(stat / 0.2794) / 100) */
 export function critStatToRate(critStat: number): number {
-  return Math.floor(critStat / 0.2794) / 100
+  return Math.floor(critStat / CRIT_STAT_DIVISOR) / 100
 }
 
 /** 신속 스탯 → 속도% (LOPEC: floor(stat / 0.5821) / 100) */
 export function hasteStatToSpeed(hasteStat: number): number {
-  return Math.floor(hasteStat / 0.5821) / 100
-}
-
-// ===================================================================
-// 클래스별 직업 각인 효과
-// ===================================================================
-
-/**
- * 직업 각인 패시브 효과
- *
- * LOPEC Module 49295에서 추출한 전체 54개 직업 각인 데이터.
- * critRate/critDmg: 고정값 또는 속도 기반 계산 함수
- * atkSpeed/moveSpeed: 고정 % 보너스
- */
-interface ClassPassiveEffect {
-  critRate: number | ((moveSpeed: number) => number)
-  critDmg: number | ((atkSpeed: number) => number)
-  atkSpeed: number
-  moveSpeed: number
-}
-
-/** LOPEC 기준 전체 직업 각인 패시브 테이블 */
-const CLASS_PASSIVE: Record<string, ClassPassiveEffect> = {
-  // ── 워리어 계열 ──
-  '고독한 기사':     { critRate: 15, critDmg: 45, atkSpeed: 0, moveSpeed: 0 },
-  '전투 태세':       { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '광기':           { critRate: 30, critDmg: 0, atkSpeed: 15, moveSpeed: 15 },
-  '광전사의 비기':   { critRate: 30, critDmg: 0, atkSpeed: 20, moveSpeed: 20 },
-  '분노의 망치':     { critRate: 18, critDmg: 51, atkSpeed: 0, moveSpeed: 0 },
-  '중력 수련':       { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '처단자':         { critRate: 30, critDmg: 0, atkSpeed: 20, moveSpeed: 20 },
-  '포식자':         { critRate: 30, critDmg: 51, atkSpeed: 20, moveSpeed: 20 },
-  '심판자':         { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 15 },
-  '빛의 기사':       { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 30 },
-
-  // ── 무도가 계열 ──
-  '충격 단련':       { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '극의: 체술':      { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '오의 강화':       { critRate: 30, critDmg: 0, atkSpeed: 8, moveSpeed: 16 },
-  '초심':           { critRate: 30, critDmg: 0, atkSpeed: 8, moveSpeed: 16 },
-  '역천지체':       { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '세맥타통':       { critRate: 0, critDmg: 75, atkSpeed: 0, moveSpeed: 0 },
-  '절제':           { critRate: 20, critDmg: 70, atkSpeed: 0, moveSpeed: 0 },
-  '절정':           { critRate: 20, critDmg: 70, atkSpeed: 15, moveSpeed: 15 },
-  '일격필살':       { critRate: 20, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '오의난무':       { critRate: 20, critDmg: 0, atkSpeed: 8, moveSpeed: 0 },
-  '권왕파천무':     { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '수라의 길':       { critRate: 0, critDmg: 0, atkSpeed: 15, moveSpeed: 15 },
-
-  // ── 헌터 계열 ──
-  '전술 탄환':       { critRate: 34, critDmg: 14, atkSpeed: 0, moveSpeed: 0 },
-  '핸드거너':       { critRate: 10, critDmg: 0, atkSpeed: 8, moveSpeed: 8 },
-  '두 번째 동료':    { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 8 },
-  '죽음의 습격':     { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '포격 강화':       { critRate: 40, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '화력 강화':       { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '아르데타인의 기술': { critRate: 9, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '진화의 유산':     { critRate: 0, critDmg: 0, atkSpeed: 15, moveSpeed: 30 },
-  '피스메이커':      { critRate: 25, critDmg: 0, atkSpeed: 16, moveSpeed: 0 },
-  '사냥의 시간':     { critRate: 55, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-
-  // ── 마법사 계열 ──
-  '황후의 은총':     { critRate: 10, critDmg: 0, atkSpeed: 19.2, moveSpeed: 30 },
-  '황제의 칙령':     { critRate: 10, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '넘치는 교감':     { critRate: 11.8, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '상급 소환사':     { critRate: 27.8, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '진실된 용맹':     { critRate: 30, critDmg: 0, atkSpeed: 8, moveSpeed: 0 },
-  '점화':           { critRate: 30, critDmg: 55, atkSpeed: 0, moveSpeed: 0 },
-  '환류':           { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-
-  // ── 암살자 계열 ──
-  '버스트':         { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 22.8 },
-  '잔재된 기운':     { critRate: 0, critDmg: 0, atkSpeed: 24.8, moveSpeed: 24.8 },
-  '멈출 수 없는 충동': { critRate: 30, critDmg: 0, atkSpeed: 0, moveSpeed: 20 },
-  '완벽한 억제':     { critRate: 10, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '달의 소리':       { critRate: 10, critDmg: 0, atkSpeed: 10, moveSpeed: 10 },
-  '갈증':           { critRate: 23, critDmg: 0, atkSpeed: 10, moveSpeed: 10 },
-  '만월의 집행자':   { critRate: 34, critDmg: 0, atkSpeed: 0, moveSpeed: 39.2 },
-  '그믐의 경계':     { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 19.2 },
-
-  // ── 스페셜리스트 계열 ──
-  '회귀':           { critRate: 25, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  // 질풍노도는 속도 기반 특수 계산
-  '질풍노도':       {
-    critRate: (ms) => 10 + Math.floor(0.3 * Math.min(ms, 40) * 100) / 100,
-    critDmg: (as) => Math.floor(1.2 * Math.min(as, 40) * 100) / 100,
-    atkSpeed: 12,
-    moveSpeed: 12,
-  },
-  '이슬비':         { critRate: 10, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '야성':           { critRate: 30, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '환수 각성':       { critRate: 0, critDmg: 60, atkSpeed: 20, moveSpeed: 20 },
-  '업화의 계승자':   { critRate: 20, critDmg: 0, atkSpeed: 15, moveSpeed: 15 },
-  '드레드 로어':     { critRate: 15, critDmg: 0, atkSpeed: 15, moveSpeed: 0 },
-
-  // ── 서포트 (전투 스탯 없음) ──
-  '절실한 구원':     { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '축복의 오라':     { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '만개':           { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
-  '해방자':         { critRate: 0, critDmg: 0, atkSpeed: 0, moveSpeed: 0 },
+  return Math.floor(hasteStat / HASTE_STAT_DIVISOR) / 100
 }
 
 /** 캐릭터 secondClass(직업 각인)에서 패시브 효과 조회 */
 function getClassPassive(secondClass: string): ClassPassiveEffect | null {
-  return CLASS_PASSIVE[secondClass] ?? null
-}
-
-/** 직업 각인의 치적 값 계산 (고정값 또는 함수) */
-function resolvePassiveCritRate(passive: ClassPassiveEffect, moveSpeed: number): number {
-  return typeof passive.critRate === 'function' ? passive.critRate(moveSpeed) : passive.critRate
-}
-
-/** 직업 각인의 치피 값 계산 (고정값 또는 함수) */
-function resolvePassiveCritDmg(passive: ClassPassiveEffect, atkSpeed: number): number {
-  return typeof passive.critDmg === 'function' ? passive.critDmg(atkSpeed) : passive.critDmg
+  return CLASS_PASSIVES[secondClass] ?? null
 }
 
 // ===================================================================
@@ -177,7 +83,6 @@ export function calculateEfficiency(
   const classPassive = getClassPassive(data.profile.secondClass)
 
   // ─── 1. 속도 계산 ───
-  const BASE_SPEED = 14
   const speedFromStat = hasteStatToSpeed(stats.haste)
   const classAtkSpeed = classPassive?.atkSpeed ?? 0
   const classMoveSpeed = classPassive?.moveSpeed ?? 0
@@ -410,56 +315,16 @@ export function calculateEfficiency(
   const engTotal = (engProduct - 1) * 100
 
   // ─── 6. 메인노드 효율 ───
-  // 지원 클래스: 기상술사(음속 돌파), 발키리(입식 타격가), 브레이커(인파이팅)
+  // 데이터: src/config/tables/main-nodes.ts (MAIN_NODE_DEFS)
+  // 알고리즘: 노드 type별로 분기 (speed_based / flat / crit_overflow)
   const mainNode = arkPassive.evolution.nodes.find(n => n.tier === 5)
-  const mainNodeBreakdown: BreakdownItem[] = []
-  let mainNodeTotal = 0
-
-  if (mainNode) {
-    const lv = mainNode.level
-
-    if (mainNode.name === '음속 돌파') {
-      // LOPEC 공식 (Lv별 계수 다름):
-      // Lv1: under=0.05, both bonus=4,  over=0.15, cap=12
-      // Lv2: under=0.10, both bonus=8,  over=0.30, cap=24
-      const params = lv === 1
-        ? { under: 0.05, both: 4, over: 0.15, cap: 12 }
-        : { under: 0.10, both: 8, over: 0.30, cap: 24 }
-      const as = totalAtkSpeed
-      const ms = totalMoveSpeed
-      const i = Math.min(as, 40) * params.under + Math.min(ms, 40) * params.under
-      const o = Math.max(0, as - 40) * params.over + Math.max(0, ms - 40) * params.over
-      const bonus = (as > 40 && ms > 40) ? params.both : 0
-      mainNodeTotal = Math.min(Math.floor((i + bonus + o) * 100) / 100, params.cap)
-      mainNodeBreakdown.push({ source: `${mainNode.name} Lv.${lv}`, value: mainNodeTotal })
-      mainNodeBreakdown.push({ source: '상한', value: params.cap })
-    } else if (mainNode.name === '입식 타격가') {
-      // 발키리: 고정값
-      const cap = lv === 1 ? 10.5 : 21
-      mainNodeTotal = cap
-      mainNodeBreakdown.push({ source: `${mainNode.name} Lv.${lv}`, value: cap })
-      mainNodeBreakdown.push({ source: '상한', value: cap })
-    } else if (mainNode.name === '인파이팅') {
-      // 브레이커: 고정값
-      const cap = lv === 1 ? 9 : 18
-      mainNodeTotal = cap
-      mainNodeBreakdown.push({ source: `${mainNode.name} Lv.${lv}`, value: cap })
-      mainNodeBreakdown.push({ source: '상한', value: cap })
-    } else if (mainNode.name === '뭉툭한 가시') {
-      // 아르카나/브레이커: 치적 80% 캡 + 초과분 진피
-      // Lv1: base=7.5, overflow=1.25, cap=52.5
-      // Lv2: base=15.0, overflow=1.5, cap=75
-      const params = lv === 1
-        ? { base: 7.5, overflow: 1.25, cap: 52.5 }
-        : { base: 15.0, overflow: 1.5, cap: 75 }
-      const overflow = Math.max(0, critRateTotal - 80) * params.overflow
-      mainNodeTotal = Math.min(params.base + overflow, params.cap)
-      mainNodeBreakdown.push({ source: `${mainNode.name} Lv.${lv}`, value: mainNodeTotal })
-      mainNodeBreakdown.push({ source: '상한', value: params.cap })
-    } else {
-      mainNodeBreakdown.push({ source: `${mainNode.name} (지원 안 함)`, value: 0 })
-    }
-  }
+  const { total: mainNodeTotal, breakdown: mainNodeBreakdown } = mainNode
+    ? calcMainNode(mainNode.name, mainNode.level, {
+        atkSpeed: totalAtkSpeed,
+        moveSpeed: totalMoveSpeed,
+        critRate: critRateTotal,
+      })
+    : { total: 0, breakdown: [] as BreakdownItem[] }
 
   // ─── 결과 ───
   return {
@@ -471,4 +336,59 @@ export function calculateEfficiency(
     engravingEfficiency: { total: engTotal, breakdown: engBreakdown },
     mainNodeEfficiency: { total: mainNodeTotal, breakdown: mainNodeBreakdown },
   }
+}
+
+// ===================================================================
+// 메인노드 효율 계산 헬퍼
+// ===================================================================
+
+/**
+ * 메인노드(5티어 진화) 효율 계산
+ *
+ * MAIN_NODE_DEFS 테이블에서 노드 정의를 조회하고 type에 따라 분기 계산합니다.
+ * 새 노드 type이 필요하면 src/config/tables/main-nodes.ts에 정의 추가 후
+ * 이 함수에 분기 추가가 필요합니다.
+ *
+ * @param name - 노드명 (예: "음속 돌파")
+ * @param level - 노드 레벨 (1~2)
+ * @param ctx - 계산 컨텍스트 (현재 공/이속, 치적)
+ */
+function calcMainNode(
+  name: string,
+  level: number,
+  ctx: { atkSpeed: number; moveSpeed: number; critRate: number },
+): { total: number; breakdown: BreakdownItem[] } {
+  const def = MAIN_NODE_DEFS[name]
+  if (!def) {
+    return { total: 0, breakdown: [{ source: `${name} (지원 안 함)`, value: 0 }] }
+  }
+
+  const breakdown: BreakdownItem[] = []
+  let total = 0
+
+  if (def.type === 'speed_based') {
+    const params = def.levels[level]
+    if (!params) return { total: 0, breakdown }
+    const i = Math.min(ctx.atkSpeed, 40) * params.under + Math.min(ctx.moveSpeed, 40) * params.under
+    const o = Math.max(0, ctx.atkSpeed - 40) * params.over + Math.max(0, ctx.moveSpeed - 40) * params.over
+    const bonus = (ctx.atkSpeed > 40 && ctx.moveSpeed > 40) ? params.bothBonus : 0
+    total = Math.min(Math.floor((i + bonus + o) * 100) / 100, params.cap)
+    breakdown.push({ source: `${name} Lv.${level}`, value: total })
+    breakdown.push({ source: '상한', value: params.cap })
+  } else if (def.type === 'flat') {
+    const cap = def.levels[level]
+    if (cap === undefined) return { total: 0, breakdown }
+    total = cap
+    breakdown.push({ source: `${name} Lv.${level}`, value: cap })
+    breakdown.push({ source: '상한', value: cap })
+  } else if (def.type === 'crit_overflow') {
+    const params = def.levels[level]
+    if (!params) return { total: 0, breakdown }
+    const overflow = Math.max(0, ctx.critRate - 80) * params.overflow
+    total = Math.min(params.base + overflow, params.cap)
+    breakdown.push({ source: `${name} Lv.${level}`, value: total })
+    breakdown.push({ source: '상한', value: params.cap })
+  }
+
+  return { total, breakdown }
 }
